@@ -22,10 +22,6 @@ namespace FitnessApp.Identity.Domain.ValueObjects
             string postalCode,
             string? apartmentNumber = null)
         {
-            Guard.AgainstNullOrEmpty(country, nameof(country));
-            Guard.AgainstNullOrEmpty(city, nameof(city));
-            Guard.AgainstNullOrEmpty(street, nameof(street));
-            Guard.AgainstNullOrEmpty(postalCode, nameof(postalCode));
 
             Country = country;
             City = city;
@@ -41,6 +37,10 @@ namespace FitnessApp.Identity.Domain.ValueObjects
             string postalCode,
             string? apartmentNumber = null)
         {
+            Guard.AgainstNullOrEmpty(country, nameof(country));
+            Guard.AgainstNullOrEmpty(city, nameof(city));
+            Guard.AgainstNullOrEmpty(street, nameof(street));
+            Guard.AgainstNullOrEmpty(postalCode, nameof(postalCode));
             return new Address(country, city, street, postalCode, apartmentNumber);
         }
 

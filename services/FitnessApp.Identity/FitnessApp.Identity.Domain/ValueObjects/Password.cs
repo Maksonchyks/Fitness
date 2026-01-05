@@ -13,14 +13,12 @@ namespace FitnessApp.Identity.Domain.ValueObjects
         public string Hash { get; }
         public string Salt { get; }
 
-        // Приватний конструктор
         private Password(string hash, string salt)
         {
             Hash = hash ?? throw new ArgumentNullException(nameof(hash));
             Salt = salt ?? throw new ArgumentNullException(nameof(salt));
         }
 
-        // Статичний метод валідації (повертає Result, не Result<Password>)
         public static Result Validate(string plainPassword)
         {
             if (string.IsNullOrWhiteSpace(plainPassword))
@@ -41,22 +39,20 @@ namespace FitnessApp.Identity.Domain.ValueObjects
             return Result.Success();
         }
 
-        // ЄДИНИЙ спосіб створити Password - з готовим хешем
         public static Password Create(string hash, string salt)
         {
-            if (string.IsNullOrWhiteSpace(hash))
-                throw new DomainException("Hash cannot be empty");
-
-            if (string.IsNullOrWhiteSpace(salt))
-                throw new DomainException("Salt cannot be empty");
+            Guard.AgainstNullOrEmpty(hash, nameof(hash));
+            Guard.AgainstNullOrEmpty(salt, nameof(salt));
 
             return new Password(hash, salt);
         }
 
-        // Додатковий метод для зручності (якщо потрібен)
-        public static Password FromHash(string hash, string salt)
+        public bool Matches(string plainPassword, Func<string, string, string, bool> verifyFunc)
         {
-            return Create(hash, salt);
+            if (string.IsNullOrWhiteSpace(plainPassword))
+                return false;
+
+            return verifyFunc(plainPassword, this.Hash, this.Salt);
         }
 
         protected override IEnumerable<object> GetEqualityComponents()

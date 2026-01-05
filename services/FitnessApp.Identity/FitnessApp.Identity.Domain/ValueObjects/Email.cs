@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FitnessApp.Identity.Domain.Common;
 using FitnessApp.Identity.Domain.Exceptions;
 
 namespace FitnessApp.Identity.Domain.ValueObjects
@@ -13,18 +14,18 @@ namespace FitnessApp.Identity.Domain.ValueObjects
 
         private Email(string value)
         {
-            if (string.IsNullOrWhiteSpace(value))
-                throw new InvalidEmailException("Email cannot be empty");
-
-            if (!IsValidEmail(value))
-                throw new InvalidEmailException("Invalid email format");
-
-            Value = value.ToLower().Trim();
+            Value = value;
         }
 
         public static Email Create(string email)
         {
-            return new Email(email);
+            Guard.AgainstNullOrEmpty(email, nameof(email));
+            var trimmedEmail = email.ToLower().Trim();
+
+            if (!IsValidEmail(trimmedEmail))
+                throw new InvalidEmailException("Invalid email format");
+
+            return new Email(trimmedEmail);
         }
         private static bool IsValidEmail(string email)
         {

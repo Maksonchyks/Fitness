@@ -11,12 +11,10 @@ namespace FitnessApp.Identity.Domain.Events
     {
         public Guid UserId { get; }
         public DateTime OccurredOn { get; }
-        public DateTime ChangedAt { get; }
 
         public UserPasswordChangedDomainEvent(Guid userId, DateTime changedAt)
         {
             UserId = userId;
-            ChangedAt = changedAt;
             OccurredOn = DateTime.UtcNow;
         }
     }

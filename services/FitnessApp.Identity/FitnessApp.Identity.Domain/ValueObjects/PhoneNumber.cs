@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FitnessApp.Identity.Domain.Common;
 using FitnessApp.Identity.Domain.Exceptions;
 
 namespace FitnessApp.Identity.Domain.ValueObjects
@@ -14,21 +15,20 @@ namespace FitnessApp.Identity.Domain.ValueObjects
 
         private PhoneNumber(string value, string countryCode = "+380")
         {
-            if (string.IsNullOrWhiteSpace(value))
-                throw new DomainException("Phone number cannot be empty");
-
-            var cleanNumber = value.Replace(" ", "").Replace("-", "").Replace("(", "").Replace(")", "");
-
-            if (!System.Text.RegularExpressions.Regex.IsMatch(cleanNumber, @"^\+?\d{10,15}$"))
-                throw new DomainException("Invalid phone number format");
-
-            Value = cleanNumber;
+            Value = value;
             CountryCode = countryCode;
         }
 
         public static PhoneNumber Create(string phoneNumber, string countryCode = "+380")
         {
-            return new PhoneNumber(phoneNumber, countryCode);
+            Guard.AgainstNullOrEmpty(phoneNumber, nameof(phoneNumber));
+
+            var cleanNumber = phoneNumber.Replace(" ", "").Replace("-", "").Replace("(", "").Replace(")", "");
+
+            if (!System.Text.RegularExpressions.Regex.IsMatch(cleanNumber, @"^\+?\d{10,15}$"))
+                throw new DomainException("Invalid phone number format");
+
+            return new PhoneNumber(cleanNumber, countryCode);
         }
 
         protected override IEnumerable<object> GetEqualityComponents()
