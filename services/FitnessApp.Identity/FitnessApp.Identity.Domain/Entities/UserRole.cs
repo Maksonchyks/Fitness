@@ -6,11 +6,9 @@ public class UserRole : Entity
     public Guid RoleId { get; private set; }
     public DateTime AssignedAt { get; private set; }
 
-    // Навігаційні властивості (nullable для EF Core)
     public User? User { get; private set; }
     public Role? Role { get; private set; }
 
-    // Приватний конструктор для EF Core
     private UserRole() : base() { }
 
     public UserRole(User user, Role role) : base()

@@ -39,7 +39,6 @@ public class RefreshToken : Entity
         CreatedByIp = createdByIp ?? throw new ArgumentNullException(nameof(createdByIp));
     }
 
-    // Фабричний метод для створення
     public static RefreshToken Create(
         Guid userId,
         string token,
@@ -59,7 +58,6 @@ public class RefreshToken : Entity
             ipAddress);
     }
 
-    // Відкликати токен
     public void Revoke(string revokedByIp, string? replacedByToken = null, string reason = "Replaced by new token")
     {
         if (IsRevoked)
@@ -77,7 +75,6 @@ public class RefreshToken : Entity
         ReasonRevoked = reason;
     }
 
-    // Продовжити життя токена
     public void Extend(int additionalDays)
     {
         if (IsRevoked || IsExpired)

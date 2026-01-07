@@ -10,7 +10,6 @@ public class Role : Entity
     private readonly List<UserRole> _userRoles = new();
     public IReadOnlyCollection<UserRole> UserRoles => _userRoles.AsReadOnly();
 
-    // Приватний конструктор для EF Core
     private Role() : base()
     {
         Name = string.Empty;
