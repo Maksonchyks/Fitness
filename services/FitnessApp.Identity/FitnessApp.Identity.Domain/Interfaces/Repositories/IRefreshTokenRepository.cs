@@ -7,7 +7,7 @@ using FitnessApp.Identity.Domain.Entities;
 
 namespace FitnessApp.Identity.Domain.Interfaces.Repositories
 {
-    interface IRefreshTokenRepository
+    public interface IRefreshTokenRepository
     {
         Task<RefreshToken?> GetByTokenAsync(string token, CancellationToken cancellationToken = default);
         Task AddAsync(RefreshToken token, CancellationToken cancellationToken = default);
