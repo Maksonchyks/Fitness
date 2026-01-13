@@ -3,8 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using FitnessApp.Identity.Domain.Entities;
-using FitnessApp.Identity.Domain.Services;
-using Microsoft.Extensions.Configuration;
+using FitnessApp.Identity.Application.Interfaces;
 
 namespace FitnessApp.Identity.Infrastructure.Services
 {

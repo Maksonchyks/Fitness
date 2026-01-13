@@ -4,7 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using FitnessApp.Identity.Domain.Services;
+using FitnessApp.Identity.Application.Interfaces;
 using Microsoft.AspNetCore.Http;
 
 namespace FitnessApp.Identity.Infrastructure.Services

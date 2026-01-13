@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using FitnessApp.Identity.Domain.Services;
+using FitnessApp.Identity.Application.Interfaces;
 using Microsoft.Extensions.Caching.Distributed;
 
 namespace FitnessApp.Identity.Infrastructure.Services
