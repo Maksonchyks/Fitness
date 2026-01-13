@@ -1,0 +1,18 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using FluentValidation;
+
+namespace FitnessApp.Identity.Application.UseCases.Auth.RefreshToken
+{
+    public class RefreshTokenCommandValidator : AbstractValidator<RefreshTokenCommand>
+    {
+        public RefreshTokenCommandValidator()
+        {
+            RuleFor(x => x.RefreshToken)
+                .NotEmpty().WithMessage("Refresh token is required.");
+        }
+    }
+}
