@@ -26,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FitnessApp.Identity.Application\FitnessApp.Identity.Application.csproj" />
     <ProjectReference Include="..\FitnessApp.Identity.Domain\FitnessApp.Identity.Domain.csproj" />
   </ItemGroup>
 

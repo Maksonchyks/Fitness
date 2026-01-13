@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FitnessApp.Identity.Application.Interfaces;
 using FitnessApp.Identity.Domain.Interfaces.Repositories;
-using FitnessApp.Identity.Domain.Services;
 using FitnessApp.Identity.Infrastructure.Data;
 using FitnessApp.Identity.Infrastructure.Repositories;
 using FitnessApp.Identity.Infrastructure.Services;
