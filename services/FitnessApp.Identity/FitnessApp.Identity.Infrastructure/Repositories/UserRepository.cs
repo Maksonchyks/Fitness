@@ -26,23 +26,26 @@ namespace FitnessApp.Identity.Infrastructure.Repositories
 
         public async Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken = default)
         {
+            var emailObject = Email.Create(email);
             return await _context.Users
-                .AnyAsync(u => u.Email.Value == email.ToLower(), cancellationToken);
+                .AnyAsync(u => u.Email == emailObject, cancellationToken);
         }
 
         public async Task<bool> ExistsByUsernameAsync(string username, CancellationToken cancellationToken = default)
         {
+            var lowerUsername = username.ToLower();
             return await _context.Users
-                            .AnyAsync(u => u.Username == username.ToLower(), cancellationToken);
+                .AnyAsync(u => u.Username == lowerUsername, cancellationToken);
         }
 
         public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
         {
+            var emailObject = Email.Create(email);
+
             return await _context.Users
                 .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role)
-                .FirstOrDefaultAsync(u => u.Email.Value == email.ToLower(), cancellationToken);
-
+                .FirstOrDefaultAsync(u => u.Email == emailObject, cancellationToken);
         }
 
         public async Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
