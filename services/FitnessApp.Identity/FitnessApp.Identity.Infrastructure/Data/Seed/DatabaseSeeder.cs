@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FitnessApp.Identity.Domain.Entities;
+using FitnessApp.Identity.Domain.Enums;
 using FitnessApp.Identity.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
@@ -42,6 +43,7 @@ namespace FitnessApp.Identity.Infrastructure.Data.Seed
 
         private async Task SeedDefaultAdminAsync()
         {
+            // 1. Перевірка на існування (залишаємо як було)
             if (await _context.Users.AnyAsync(u => u.Username == "admin"))
                 return;
 
@@ -50,7 +52,7 @@ namespace FitnessApp.Identity.Infrastructure.Data.Seed
                 return;
 
             var password = Password.Create(
-                "$2a$11$abcdefghijklmnopqrstuv", // Хеш для "Admin123!"
+                "$2a$11$abcdefghijklmnopqrstuv",
                 "$2a$11$abcdefghijklmnopqrstuv"
             );
 
@@ -63,8 +65,16 @@ namespace FitnessApp.Identity.Infrastructure.Data.Seed
             );
 
             admin.AddRole(adminRole);
-            admin.ConfirmEmail();
-            admin.Activate();
+
+            if (!admin.EmailConfirmed)
+            {
+                admin.ConfirmEmail();
+            }
+
+            if (admin.Status != AccountStatus.Active)
+            {
+                admin.Activate();
+            }
 
             await _context.Users.AddAsync(admin);
             await _context.SaveChangesAsync();
