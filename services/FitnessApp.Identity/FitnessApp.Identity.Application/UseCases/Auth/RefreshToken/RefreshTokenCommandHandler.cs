@@ -34,8 +34,6 @@ namespace FitnessApp.Identity.Application.UseCases.Auth.RefreshToken
             _refreshTokenRepository = refreshTokenRepository;
             _userRepository = userRepository;
             _tokenService = tokenService;
-            _jwtService = jwtService;
-            _mapper = mapper;
             _logger = logger;
         }
 
