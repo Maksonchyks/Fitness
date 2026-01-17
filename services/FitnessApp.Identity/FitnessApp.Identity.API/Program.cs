@@ -1,25 +1,33 @@
+using FitnessApp.Identity.API.Extensions;
+using FitnessApp.Identity.Application.Extensions;
+using FitnessApp.Identity.Infrastructure.Extensions;
+using Serilog;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Host.UseSerilog((context, configuration) =>
+    configuration.ReadFrom.Configuration(context.Configuration));
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSerilogLogging(builder.Configuration);
+builder.Services.AddApi(builder.Configuration);
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage();
 }
 
-app.UseHttpsRedirection();
+app.UseApi(builder.Configuration);
 
-app.UseAuthorization();
+if (builder.Configuration.GetValue<bool>("InitializeDatabase", true))
+{
+    await app.InitializeDatabaseAsync();
+}
 
-app.MapControllers();
 
 app.Run();
+
+public partial class Program { }
