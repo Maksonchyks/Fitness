@@ -109,7 +109,7 @@ namespace FitnessApp.Identity.Application.Services
         private string GetIpAddress()
         {
             // Це буде імплементовано в контролері
-            return string.Empty;
+            return "93.170.19";
         }
     }
 }
