@@ -4,6 +4,7 @@ using System.Linq;
 using FitnessApp.Identity.Application.Interfaces;
 using FitnessApp.Identity.Domain.Interfaces.Repositories;
 using FitnessApp.Identity.Infrastructure.Data;
+using FitnessApp.Identity.Infrastructure.Data.Seed;
 using FitnessApp.Identity.Infrastructure.Repositories;
 using FitnessApp.Identity.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
@@ -50,7 +51,7 @@ namespace FitnessApp.Identity.Infrastructure.Extensions
                     options.LogTo(Console.WriteLine, LogLevel.Information);
                 }
             });
-
+            services.AddScoped<DatabaseSeeder>();
             return services;
         }
 
