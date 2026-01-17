@@ -26,8 +26,6 @@ namespace FitnessApp.Identity.Application.UseCases.Auth.RefreshToken
             IRefreshTokenRepository refreshTokenRepository,
             IUserRepository userRepository,
             ITokenService tokenService,
-            IJwtService jwtService,
-            IMapper mapper,
             ILogger<RefreshTokenCommandHandler> logger)
         {
             _unitOfWork = unitOfWork;
