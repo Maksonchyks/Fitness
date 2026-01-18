@@ -20,17 +20,20 @@ namespace FitnessApp.Identity.Application.UseCases.Users.UpdateProfile
         private readonly ICurrentUserService _currentUserService;
         private readonly IMapper _mapper;
         private readonly ILogger<UpdateProfileCommandHandler> _logger;
+        private readonly IRedisCacheService _cacheService;
 
         public UpdateProfileCommandHandler(
             IUserRepository userRepository,
             ICurrentUserService currentUserService,
             IMapper mapper,
-            ILogger<UpdateProfileCommandHandler> logger)
+            ILogger<UpdateProfileCommandHandler> logger,
+            IRedisCacheService cacheService)
         {
             _userRepository = userRepository;
             _currentUserService = currentUserService;
             _mapper = mapper;
             _logger = logger;
+            _cacheService = cacheService;
         }
 
         public async Task<UserResponse> Handle(UpdateProfileCommand request, CancellationToken cancellationToken)
@@ -65,6 +68,9 @@ namespace FitnessApp.Identity.Application.UseCases.Users.UpdateProfile
 
             _userRepository.Update(user);
             await _userRepository.SaveChangesAsync(cancellationToken);
+
+            string cacheKey = $"user_profile_{user.Id}";
+            await _cacheService.RemoveAsync(cacheKey, cancellationToken);
 
             _logger.LogInformation("Profile updated for user: {UserId}", user.Id);
 

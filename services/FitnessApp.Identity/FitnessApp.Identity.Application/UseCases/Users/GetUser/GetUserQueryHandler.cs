@@ -19,17 +19,19 @@ namespace FitnessApp.Identity.Application.UseCases.Users.GetUser
         private readonly ICurrentUserService _currentUserService;
         private readonly IMapper _mapper;
         private readonly ILogger<GetUserQueryHandler> _logger;
-
+        private readonly IRedisCacheService _cacheService;
         public GetUserQueryHandler(
             IUserRepository userRepository,
             ICurrentUserService currentUserService,
             IMapper mapper,
-            ILogger<GetUserQueryHandler> logger)
+            ILogger<GetUserQueryHandler> logger,
+            IRedisCacheService cacheService)
         {
             _userRepository = userRepository;
             _currentUserService = currentUserService;
             _mapper = mapper;
             _logger = logger;
+            _cacheService = cacheService;
         }
 
         public async Task<UserResponse> Handle(GetUserQuery request, CancellationToken cancellationToken)
@@ -43,6 +45,15 @@ namespace FitnessApp.Identity.Application.UseCases.Users.GetUser
                 throw new ForbiddenException("You don't have permission to access this user");
             }
 
+            string cacheKey = $"user_profile_{request.UserId}";
+
+            var cachedUser = await _cacheService.GetAsync<UserResponse>(cacheKey, cancellationToken);
+
+            if (cachedUser != null)
+            {
+                return cachedUser;
+            }
+
             var user = await _userRepository.GetByIdAsync(request.UserId, cancellationToken);
 
             if (user == null)
@@ -52,8 +63,12 @@ namespace FitnessApp.Identity.Application.UseCases.Users.GetUser
             }
 
             _logger.LogInformation("User profile retrieved: {UserId}", user.Id);
+            
+            var response = _mapper.Map<UserResponse>(user);
+            
+            await _cacheService.SetAsync(cacheKey, response, TimeSpan.FromMinutes(10), cancellationToken);
 
-            return _mapper.Map<UserResponse>(user);
+            return response;
         }
     }
 }
