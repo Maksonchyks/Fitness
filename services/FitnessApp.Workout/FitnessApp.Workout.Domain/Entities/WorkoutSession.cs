@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using FitnessApp.Workout.Domain.Enums;
 using FitnessApp.Workout.Domain.Events;
 using FitnessApp.Workout.Domain.Exceptions;
+using FitnessApp.Workout.Domain.ValueObjects;
 
 namespace FitnessApp.Workout.Domain.Entities
 {

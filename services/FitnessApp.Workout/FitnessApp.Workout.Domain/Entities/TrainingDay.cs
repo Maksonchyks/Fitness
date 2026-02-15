@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FitnessApp.Workout.Domain.Enums;
+using FitnessApp.Workout.Domain.ValueObjects;
 
 namespace FitnessApp.Workout.Domain.Entities
 {
@@ -24,11 +25,6 @@ namespace FitnessApp.Workout.Domain.Entities
         }
         public void AddExercise(ExerciseSet exerciseSet)
         {
-            if (exerciseSet.TrainingDayId != this.Id)
-            {
-                throw new ArgumentException("Вправа не належить до цього тренувального дня.");
-            }
-
             _exercises.Add(exerciseSet);
         }
     }
