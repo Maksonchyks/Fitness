@@ -7,6 +7,7 @@ using AutoMapper;
 using FitnessApp.Workout.Application.Interfaces;
 using FitnessApp.Workout.Domain.Entities;
 using FitnessApp.Workout.Domain.Interfaces.Persistence;
+using FitnessApp.Workout.Domain.ValueObjects;
 using MediatR;
 
 namespace FitnessApp.Workout.Application.Features.Commands.RecordSession

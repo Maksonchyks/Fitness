@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using FitnessApp.Workout.Application.DTOs;
 using FitnessApp.Workout.Domain.Entities;
+using FitnessApp.Workout.Domain.ValueObjects;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace FitnessApp.Workout.Application.Mappings
