@@ -15,14 +15,12 @@ namespace FitnessApp.Workout.Domain.ValueObjects
         public float Weight { get; private set; }
         public int Reps { get; private set; }
         public int Sets { get; private set; }
-        public DateTime CreatedOn { get; private set; }
         private ExerciseSet(ExerciseType exerciseType, float weight, int reps, int sets)
         {
             ExerciseType = exerciseType;
             Weight = weight;
             Reps = reps;
             Sets = sets;
-            CreatedOn = DateTime.UtcNow;
         }
 
         public static ExerciseSet Create(ExerciseType exerciseType, float weight, int reps, int sets)
