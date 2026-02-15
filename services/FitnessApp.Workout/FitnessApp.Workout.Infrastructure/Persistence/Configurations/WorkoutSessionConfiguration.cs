@@ -24,8 +24,8 @@ namespace FitnessApp.Workout.Infrastructure.Persistence.Configurations
                 .IsRequired();
 
             builder.Property(ws => ws.Date)
-                .IsRequired()
-                .HasDefaultValueSql("timezone('utc', now())");
+                .HasColumnName("CreatedOn")
+                .IsRequired();
 
             
             builder.OwnsMany(ws => ws.PerformedExercises, eb =>
@@ -36,10 +36,6 @@ namespace FitnessApp.Workout.Infrastructure.Persistence.Configurations
 
                 eb.Property<Guid>("Id");
                 eb.HasKey("Id");
-
-                eb.Property(e => e.CreatedOn)
-                .IsRequired()
-                .HasDefaultValueSql("timezone('utc', now())");
 
                 eb.Property(e => e.ExerciseType).IsRequired();
 

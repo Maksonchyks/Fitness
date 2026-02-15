@@ -26,8 +26,7 @@ namespace FitnessApp.Workout.Infrastructure.Persistence.Configurations
 
             builder.Property(p => p.CreatedOn)
                 .HasColumnName("CreatedOn")
-                .IsRequired()
-                .HasDefaultValueSql("timezone('utc', now())");
+                .IsRequired();
 
             builder.OwnsOne(p => p.ProgramProfile, navigationBuilder =>
             {

@@ -57,10 +57,6 @@ namespace FitnessApp.Workout.Infrastructure.Persistence.Configurations
                 exerciseBuilder.Property(e => e.Sets)
                     .IsRequired();
 
-                exerciseBuilder.Property(e => e.CreatedOn)
-                    .IsRequired()
-                    .HasDefaultValueSql("timezone('utc', now())");
-
                 exerciseBuilder.HasIndex("TrainingDayId");
             });
 
