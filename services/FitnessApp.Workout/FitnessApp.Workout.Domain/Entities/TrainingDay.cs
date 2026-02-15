@@ -8,9 +8,8 @@ using FitnessApp.Workout.Domain.ValueObjects;
 
 namespace FitnessApp.Workout.Domain.Entities
 {
-    public class TrainingDay
+    public class TrainingDay : Entity
     {
-        public Guid Id { get; private set; }
         public Guid TrainingProgramId { get; private set; }
         public TrainingProgram? TrainingProgram { get; private set; }
         public int DayNumber { get; private set; }
@@ -19,7 +18,6 @@ namespace FitnessApp.Workout.Domain.Entities
         public IReadOnlyCollection<ExerciseSet> Exercises => _exercises.AsReadOnly();
         public TrainingDay(Guid trainingProgramId, int dayNumber)
         {
-            Id = Guid.NewGuid();
             TrainingProgramId = trainingProgramId;
             DayNumber = dayNumber;
         }
