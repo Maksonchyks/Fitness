@@ -17,9 +17,11 @@ namespace FitnessApp.Workout.Infrastructure.Persistence.Configurations
             builder.ToTable("TrainingDays");
 
             builder.HasKey(td => td.Id);
-
             builder.Property(td => td.Id)
                 .ValueGeneratedNever();
+
+            builder.Property(td => td.TrainingProgramId)
+                .IsRequired();
 
             builder.Property(td => td.DayNumber)
                 .IsRequired();
@@ -33,20 +35,37 @@ namespace FitnessApp.Workout.Infrastructure.Persistence.Configurations
             {
                 exerciseBuilder.ToTable("PlannedExercises");
 
-                exerciseBuilder.Property<Guid>("Id");
+                exerciseBuilder.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd();
+
                 exerciseBuilder.HasKey("Id");
 
+                exerciseBuilder.WithOwner()
+                    .HasForeignKey("TrainingDayId");
+
+                exerciseBuilder.Property(e => e.ExerciseType)
+                    .HasConversion<int>()
+                    .IsRequired();
+
+                exerciseBuilder.Property(e => e.Weight)
+                    .HasPrecision(5, 2)
+                    .IsRequired();
+
+                exerciseBuilder.Property(e => e.Reps)
+                    .IsRequired();
+
+                exerciseBuilder.Property(e => e.Sets)
+                    .IsRequired();
+
                 exerciseBuilder.Property(e => e.CreatedOn)
-                .IsRequired()
-                .HasDefaultValueSql("timezone('utc', now())");
+                    .IsRequired()
+                    .HasDefaultValueSql("timezone('utc', now())");
 
-                exerciseBuilder.Property(e => e.ExerciseType).IsRequired();
-                exerciseBuilder.Property(e => e.Weight).HasPrecision(5, 2);
-                exerciseBuilder.Property(e => e.Reps).IsRequired();
-                exerciseBuilder.Property(e => e.Sets).IsRequired();
-
-                exerciseBuilder.WithOwner().HasForeignKey("TrainingDayId");
+                exerciseBuilder.HasIndex("TrainingDayId");
             });
+
+            builder.Navigation(td => td.Exercises)
+                .AutoInclude();
         }
     }
 }
