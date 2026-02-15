@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FitnessApp.Workout.Domain.Common;
 using FitnessApp.Workout.Domain.Enums;
+using FitnessApp.Workout.Domain.Exceptions;
 
 namespace FitnessApp.Workout.Domain.ValueObjects
 {
@@ -27,8 +28,8 @@ namespace FitnessApp.Workout.Domain.ValueObjects
         public static ExerciseSet Create(ExerciseType exerciseType, float weight, int reps, int sets)
         {
             Guard.AgainstNegativeValue(weight);
-            Guard.AgainstNegativeValue(reps);
-            Guard.AgainstNegativeValue(sets);
+            if (reps <= 0) throw new DomainException("Reps must be greater than 0");
+            if (sets <= 0) throw new DomainException("Sets must be greater than 0");
 
             return new ExerciseSet(exerciseType, weight, reps, sets);
         }
