@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -57,6 +57,14 @@ namespace FitnessApp.Identity.Infrastructure.Repositories
 
         }
 
+        public async Task<IReadOnlyList<User>> GetAllAsync(CancellationToken cancellationToken = default)
+        {
+            return await _context.Users
+                .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+                .ToListAsync(cancellationToken);
+        }
+
         public async Task<User?> GetByUsernameAsync(string username, CancellationToken cancellationToken = default)
         {
             return await _context.Users
@@ -68,6 +76,20 @@ namespace FitnessApp.Identity.Infrastructure.Repositories
         public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             return await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task ClearUserRolesAsync(Guid userId, CancellationToken cancellationToken = default)
+        {
+            await _context.Set<UserRole>()
+                .Where(ur => ur.UserId == userId)
+                .ExecuteDeleteAsync(cancellationToken);
+
+            // Detach tracked UserRole entities to avoid conflicts
+            var trackedUserRoles = _context.ChangeTracker.Entries<UserRole>()
+                .Where(e => e.Entity.UserId == userId)
+                .ToList();
+            foreach (var entry in trackedUserRoles)
+                entry.State = Microsoft.EntityFrameworkCore.EntityState.Detached;
         }
 
         public void Update(User user)
