@@ -45,17 +45,17 @@ namespace FitnessApp.Workout.Infrastructure.Persistence.Configurations
                     metricsBuilder.Property(pm => pm.SquatWeight)
                         .HasColumnName("PowerMetrics_SquatWeight")
                         .HasPrecision(5, 2)
-                        .IsRequired(false);
+                        .IsRequired();
 
                     metricsBuilder.Property(pm => pm.BenchPressWeight)
                         .HasColumnName("PowerMetrics_BenchPressWeight")
                         .HasPrecision(5, 2)
-                        .IsRequired(false);
+                        .IsRequired();
 
                     metricsBuilder.Property(pm => pm.DeadliftWeight)
                         .HasColumnName("PowerMetrics_DeadliftWeight")
                         .HasPrecision(5, 2)
-                        .IsRequired(false);
+                        .IsRequired();
                 });
             });
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -32,6 +32,9 @@ namespace FitnessApp.Workout.Application
             services.AddScoped<ITrainingProgramGenerator, PowerliftingGenerator>();
             services.AddScoped<ITrainingProgramGenerator, BodybuildingGenerator>();
             services.AddScoped<ITrainingProgramGenerator, FitnessGenerator>();
+            services.AddScoped<ITrainingProgramGenerator, WeightLossGenerator>();
+            services.AddScoped<ITrainingProgramGenerator, EnduranceGenerator>();
+            services.AddScoped<ITrainingProgramGenerator, RehabilitationGenerator>();
 
             return services;
         }

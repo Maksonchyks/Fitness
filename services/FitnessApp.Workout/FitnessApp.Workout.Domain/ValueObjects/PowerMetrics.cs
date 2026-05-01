@@ -9,6 +9,7 @@ namespace FitnessApp.Workout.Domain.ValueObjects
 {
     public sealed class PowerMetrics : ValueObject
     {
+        protected PowerMetrics() { }
         public float SquatWeight { get; init; }
         public float BenchPressWeight { get; init; }
         public float DeadliftWeight { get; init; }

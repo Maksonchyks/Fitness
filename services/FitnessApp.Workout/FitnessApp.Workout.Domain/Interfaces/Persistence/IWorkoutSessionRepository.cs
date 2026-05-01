@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,5 +13,6 @@ namespace FitnessApp.Workout.Domain.Interfaces.Persistence
         Task<WorkoutSession?> GetByIdAsync(Guid id, CancellationToken ct = default);
         Task<IEnumerable<WorkoutSession>> GetByUserIdAsync(Guid userId, CancellationToken ct = default);
         void Update(WorkoutSession session);
+        void Remove(WorkoutSession session);
     }
 }

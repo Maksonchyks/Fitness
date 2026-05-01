@@ -18,7 +18,7 @@ namespace FitnessApp.Workout.Domain.Entities
 
         private readonly List<TrainingDay> _trainingDays = new();
         public IReadOnlyCollection<TrainingDay> TrainingDays => _trainingDays.AsReadOnly();
-
+        protected TrainingProgram() { }
         private TrainingProgram(Guid userId, ProgramProfile programProfile) : base()
         {
             UserId = userId;

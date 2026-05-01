@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +10,7 @@ namespace FitnessApp.Workout.Domain.ValueObjects
 {
     public class ProgramProfile : ValueObject
     {
+        protected ProgramProfile() { }
         public Guid UserId { get; }
         public FitnessGoal Goal { get; }
         public Intensity Intensity { get; }
@@ -23,10 +24,6 @@ namespace FitnessApp.Workout.Domain.ValueObjects
         {
             if (userId == Guid.Empty)
                 throw new DomainException("UserId cannot be empty");
-
-            if ((goal == FitnessGoal.Powerlifting || goal == FitnessGoal.Bodybuilding)
-                && powerMetrics is null)
-                throw new DomainException("Power metrics required for strength goals");
 
             UserId = userId;
             Goal = goal;

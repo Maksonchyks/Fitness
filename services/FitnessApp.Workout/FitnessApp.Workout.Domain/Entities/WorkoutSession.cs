@@ -18,7 +18,7 @@ namespace FitnessApp.Workout.Domain.Entities
 
         private readonly List<ExerciseSet> _performedExercises = new();
         public IReadOnlyCollection<ExerciseSet> PerformedExercises => _performedExercises.AsReadOnly();
-
+        protected WorkoutSession() { }
         private WorkoutSession(Guid trainingDayId, Guid userId, List<ExerciseSet> actualResults) : base()
         {
             TrainingDayId = trainingDayId;

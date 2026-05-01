@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,11 +14,6 @@ namespace FitnessApp.Workout.Application.Features.Commands.GenerateProgram
         {
             RuleFor(x => x.FitnessGoal).IsInEnum();
             RuleFor(x => x.Intensity).IsInEnum();
-
-            RuleFor(x => x.PowerMetrics)
-                .NotNull()
-                .When(x => x.FitnessGoal == FitnessGoal.Powerlifting || x.FitnessGoal == FitnessGoal.Bodybuilding)
-                .WithMessage("Power metrics are required for your selected fitness goal.");
         }
     }
 }

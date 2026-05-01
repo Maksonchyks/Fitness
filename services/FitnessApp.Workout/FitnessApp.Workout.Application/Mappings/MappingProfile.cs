@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,11 +15,16 @@ namespace FitnessApp.Workout.Application.Mappings
     {
         public TrainingProgramMappingProfile()
         {
-            CreateMap<TrainingProgram, TrainingProgramResponse>();
+            CreateMap<TrainingProgram, TrainingProgramResponse>()
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedOn))
+                .ForMember(dest => dest.Goal, opt => opt.MapFrom(src => src.ProgramProfile.Goal))
+                .ForMember(dest => dest.Intensity, opt => opt.MapFrom(src => src.ProgramProfile.Intensity));
 
             CreateMap<TrainingDay, TrainingDayDto>();
 
             CreateMap<ExerciseSet, ExerciseSetDto>();
+
+            CreateMap<WorkoutSession, WorkoutSessionDto>();
         }
     }
 }
