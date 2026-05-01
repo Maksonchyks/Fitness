@@ -1,0 +1,146 @@
+version: '3.8'
+
+services:
+  fitness-identity-api:
+    build:
+        context: ./services/FitnessApp.Identity      
+        dockerfile: FitnessApp.Identity.API/Dockerfile
+    container_name: fitness-identity-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__IdentityDb=Host=fitness-identity-db;Port=5432;Database=fitness_identity_dev;Username=postgres;Password=1234;Pooling=true;
+      - ConnectionStrings__Redis=fitness-identity-redis:6379,abortConnect=false
+      - JwtSettings__Secret=your-super-secret-key-at-least-32-characters-long-change-in-production
+      - JwtSettings__Issuer=FitnessApp.Identity
+      - JwtSettings__Audience=FitnessApp
+    ports:
+      - "5000:8080"
+    depends_on:
+      fitness-identity-db:
+        condition: service_healthy
+      fitness-identity-redis:
+        condition: service_started
+    networks:
+      - fitness-network
+    restart: unless-stopped
+
+  fitness-identity-db:
+    image: postgres:15-alpine
+    container_name: fitness-identity-db
+    environment:
+      - POSTGRES_DB=fitness_identity_dev
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=1234
+    ports:
+      - "5433:5432"
+    volumes:
+      - fitness_identity_data:/var/lib/postgresql/data
+    networks:
+      - fitness-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d fitness_identity_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  fitness-identity-redis:
+    image: redis:7-alpine
+    container_name: fitness-identity-redis
+    ports:
+      - "6380:6379"
+    networks:
+      - fitness-network
+    restart: unless-stopped
+
+  fitness-workout-api:
+    build:
+        context: ./services/FitnessApp.Workout
+        dockerfile: FitnessApp.Workout.API/Dockerfile
+    container_name: fitness-workout-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=fitness-workout-db;Port=5432;Database=fitness_workout_dev;Username=postgres;Password=1234;Pooling=true;
+      - JwtSettings__Secret=your-super-secret-key-at-least-32-characters-long-change-in-production
+      - JwtSettings__Issuer=FitnessApp.Identity
+      - JwtSettings__Audience=FitnessApp
+    ports:
+      - "5001:8080"
+    depends_on:
+      fitness-workout-db:
+        condition: service_healthy
+    networks:
+      - fitness-network
+    restart: unless-stopped
+
+  fitness-workout-db:
+    image: postgres:15-alpine
+    container_name: fitness-workout-db
+    environment:
+      - POSTGRES_DB=fitness_workout_dev
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=1234
+    ports:
+      - "5434:5432"
+    volumes:
+      - fitness_workout_data:/var/lib/postgresql/data
+    networks:
+      - fitness-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d fitness_workout_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  fitness-nutrition-api:
+    build:
+        context: ./services/FitnessApp.Nutrition
+        dockerfile: FitnessApp.Nutrition.API/Dockerfile
+    container_name: fitness-nutrition-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=fitness-nutrition-db;Port=5432;Database=fitness_nutrition_dev;Username=postgres;Password=1234;Pooling=true;
+      - JwtSettings__Secret=your-super-secret-key-at-least-32-characters-long-change-in-production
+      - JwtSettings__Issuer=FitnessApp.Identity
+      - JwtSettings__Audience=FitnessApp
+    ports:
+      - "5002:8080"
+    depends_on:
+      fitness-nutrition-db:
+        condition: service_healthy
+    networks:
+      - fitness-network
+    restart: unless-stopped
+
+  fitness-nutrition-db:
+    image: postgres:15-alpine
+    container_name: fitness-nutrition-db
+    environment:
+      - POSTGRES_DB=fitness_nutrition_dev
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=1234
+    ports:
+      - "5435:5432"
+    volumes:
+      - fitness_nutrition_data:/var/lib/postgresql/data
+    networks:
+      - fitness-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d fitness_nutrition_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  fitness_identity_data:
+  fitness_workout_data:
+  fitness_nutrition_data:
+
+networks:
+  fitness-network:
+    driver: bridge
