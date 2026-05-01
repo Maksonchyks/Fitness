@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -57,11 +57,15 @@ namespace FitnessApp.Identity.Application.UseCases.Users.UpdateProfile
 
             var gender = ParseGender(request.Gender);
             var fitnessGoal = ParseFitnessGoal(request.FitnessGoal);
+            
+            var dobUtc = request.DateOfBirth.HasValue 
+                ? DateTime.SpecifyKind(request.DateOfBirth.Value, DateTimeKind.Utc) 
+                : (DateTime?)null;
 
             user.UpdateProfile(
                 request.FirstName,
                 request.LastName,
-                request.DateOfBirth,
+                dobUtc,
                 gender,
                 fitnessGoal,
                 request.ProfileImageUrl);

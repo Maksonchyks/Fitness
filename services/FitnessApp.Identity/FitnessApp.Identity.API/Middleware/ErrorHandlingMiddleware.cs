@@ -1,4 +1,4 @@
-﻿using FitnessApp.Identity.API.Common.Models;
+using FitnessApp.Identity.API.Common.Models;
 using FitnessApp.Identity.Application.Common.Exceptions;
 using System.Net;
 using System.Text.Json;
@@ -82,6 +82,12 @@ namespace FitnessApp.Identity.API.Middleware
                     response.StatusCode = (int)HttpStatusCode.BadRequest;
                     errorResponse.ErrorCode = appEx.ErrorCode;
                     errorResponse.Message = appEx.Message;
+                    break;
+
+                case FitnessApp.Identity.Domain.Exceptions.DomainException domainEx:
+                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    errorResponse.ErrorCode = "DOMAIN_ERROR";
+                    errorResponse.Message = domainEx.Message;
                     break;
 
                 default:

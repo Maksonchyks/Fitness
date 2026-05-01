@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,6 +18,7 @@ namespace FitnessApp.Identity.Application.DTOs
         public string? Gender { get; set; }
         public string? FitnessGoal { get; set; }
         public string? ProfileImageUrl { get; set; }
+        public DateTime? DateOfBirth { get; set; }
         public string Status { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }

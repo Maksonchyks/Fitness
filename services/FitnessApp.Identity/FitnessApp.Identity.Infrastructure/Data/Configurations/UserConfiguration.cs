@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -58,6 +58,9 @@ namespace FitnessApp.Identity.Infrastructure.Data.Configurations
             builder.Property(u => u.Gender)
                 .HasConversion<string>()
                 .HasMaxLength(20);
+
+            builder.Property(u => u.DateOfBirth)
+                .HasColumnType("timestamp with time zone");
 
             builder.Property(u => u.FitnessGoal)
                 .HasConversion<string>()

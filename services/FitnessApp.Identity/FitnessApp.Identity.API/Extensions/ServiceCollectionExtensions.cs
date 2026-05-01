@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Text.Json;
 using System.Threading.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
@@ -132,7 +132,11 @@ public static class ServiceCollectionExtensions
             };
         });
 
-        services.AddAuthorization();
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy("RequireAdminRole", policy =>
+                policy.RequireRole("Admin"));
+        });
         return services;
     }
 

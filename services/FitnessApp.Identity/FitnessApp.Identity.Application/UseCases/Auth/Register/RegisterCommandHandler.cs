@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -69,10 +69,14 @@ namespace FitnessApp.Identity.Application.UseCases.Auth.Register
 
             if (request.DateOfBirth.HasValue || request.Gender != null || request.FitnessGoal != null)
             {
+                var dobUtc = request.DateOfBirth.HasValue 
+                    ? DateTime.SpecifyKind(request.DateOfBirth.Value, DateTimeKind.Utc) 
+                    : (DateTime?)null;
+
                 user.UpdateProfile(
                     request.FirstName,
                     request.LastName,
-                    request.DateOfBirth,
+                    dobUtc,
                     ParseGender(request.Gender),
                     ParseFitnessGoal(request.FitnessGoal));
             }

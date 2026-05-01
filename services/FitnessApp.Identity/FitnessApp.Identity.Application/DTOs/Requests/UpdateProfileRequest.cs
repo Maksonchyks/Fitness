@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -38,5 +38,11 @@ namespace FitnessApp.Identity.Application.DTOs.Requests
         [Required]
         [Compare("NewPassword")]
         public string ConfirmNewPassword { get; set; } = string.Empty;
+    }
+
+    public class ChangeRoleRequest
+    {
+        [Required]
+        public string RoleName { get; set; } = string.Empty;
     }
 }

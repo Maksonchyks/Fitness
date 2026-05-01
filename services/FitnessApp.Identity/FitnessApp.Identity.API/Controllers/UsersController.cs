@@ -1,4 +1,4 @@
-﻿using FitnessApp.Identity.API.Common.Constants;
+using FitnessApp.Identity.API.Common.Constants;
 using FitnessApp.Identity.API.Common.Models;
 using FitnessApp.Identity.Application.DTOs;
 using FitnessApp.Identity.Application.DTOs.Requests;
@@ -71,6 +71,16 @@ namespace FitnessApp.Identity.API.Controllers
         }
 
       
+        [HttpGet]
+        [Authorize(Policy = "RequireAdminRole")]
+        [ProducesResponseType(typeof(List<UserResponse>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<UserResponse>>> GetUsers()
+        {
+            var query = new FitnessApp.Identity.Application.UseCases.Users.GetUsers.GetUsersQuery();
+            var result = await _mediator.Send(query);
+            return Ok(result);
+        }
+
         [HttpPost("{id:guid}/change-password")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
@@ -80,15 +90,15 @@ namespace FitnessApp.Identity.API.Controllers
             Guid id,
             [FromBody] ChangePasswordRequest request)
         {
-            // TODO: зміна пароля
-            await Task.CompletedTask;
+            var command = new FitnessApp.Identity.Application.UseCases.Users.ChangePassword.ChangePasswordCommand(
+                id, request.CurrentPassword, request.NewPassword);
+            await _mediator.Send(command);
 
             _logger.LogInformation("Password changed for user: {UserId}", id);
 
             return Ok(new { message = "Password changed successfully" });
         }
 
-     
         [HttpPost("{id:guid}/deactivate")]
         [Authorize(Policy = "RequireAdminRole")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -96,12 +106,42 @@ namespace FitnessApp.Identity.API.Controllers
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> Deactivate(Guid id)
         {
-            // TODO: деактивація профіля
-            await Task.CompletedTask;
+            var command = new FitnessApp.Identity.Application.UseCases.Users.DeactivateUser.DeactivateUserCommand(id);
+            await _mediator.Send(command);
 
             _logger.LogInformation("Account deactivated: {UserId}", id);
 
             return Ok(new { message = "Account deactivated successfully" });
+        }
+
+        [HttpPost("{id:guid}/activate")]
+        [Authorize(Policy = "RequireAdminRole")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> Activate(Guid id)
+        {
+            var command = new FitnessApp.Identity.Application.UseCases.Users.ActivateUser.ActivateUserCommand(id);
+            await _mediator.Send(command);
+
+            _logger.LogInformation("Account activated: {UserId}", id);
+
+            return Ok(new { message = "Account activated successfully" });
+        }
+
+        [HttpPost("{id:guid}/roles")]
+        [Authorize(Policy = "RequireAdminRole")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> ChangeRole(Guid id, [FromBody] ChangeRoleRequest request)
+        {
+            var command = new FitnessApp.Identity.Application.UseCases.Users.ChangeUserRole.ChangeUserRoleCommand(id, request.RoleName);
+            await _mediator.Send(command);
+
+            _logger.LogInformation("Account role changed: {UserId} to {Role}", id, request.RoleName);
+
+            return Ok(new { message = "Account role changed successfully" });
         }
     }
 }
