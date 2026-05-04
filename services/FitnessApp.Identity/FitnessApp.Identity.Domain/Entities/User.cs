@@ -1,4 +1,4 @@
-﻿using FitnessApp.Identity.Domain.Common;
+using FitnessApp.Identity.Domain.Common;
 using FitnessApp.Identity.Domain.Enums;
 using FitnessApp.Identity.Domain.Events;
 using FitnessApp.Identity.Domain.Exceptions;
@@ -86,6 +86,12 @@ namespace FitnessApp.Identity.Domain.Entities
             var userRole = _userRoles.FirstOrDefault(ur => ur.RoleId == role.Id);
             if (userRole != null)
                 _userRoles.Remove(userRole);
+        }
+
+        // Очистити всі ролі
+        public void ClearRoles()
+        {
+            _userRoles.Clear();
         }
 
         // Перевірити, чи має користувач роль
