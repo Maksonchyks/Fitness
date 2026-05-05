@@ -19,6 +19,8 @@ namespace FitnessApp.Identity.Domain.Interfaces.Repositories
         Task AddAsync(User user, CancellationToken cancellationToken = default);
         void Update(User user);
         Task ClearUserRolesAsync(Guid userId, CancellationToken cancellationToken = default);
+        Task AddUserRoleAsync(Guid userId, Guid roleId, CancellationToken cancellationToken = default);
+        Task<int> CountUsersInRoleAsync(string roleName, CancellationToken cancellationToken = default);
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }

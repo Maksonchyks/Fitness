@@ -136,12 +136,21 @@ namespace FitnessApp.Identity.API.Controllers
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> ChangeRole(Guid id, [FromBody] ChangeRoleRequest request)
         {
-            var command = new FitnessApp.Identity.Application.UseCases.Users.ChangeUserRole.ChangeUserRoleCommand(id, request.RoleName);
+            var performerId = GetCurrentUserId();
+            if (performerId == null) return Unauthorized();
+
+            var command = new FitnessApp.Identity.Application.UseCases.Users.ChangeUserRole.ChangeUserRoleCommand(id, request.RoleName, performerId.Value);
             await _mediator.Send(command);
 
-            _logger.LogInformation("Account role changed: {UserId} to {Role}", id, request.RoleName);
+            _logger.LogInformation("Account role changed: {UserId} to {Role} by {PerformerId}", id, request.RoleName, performerId);
 
             return Ok(new { message = "Account role changed successfully" });
+        }
+
+        private Guid? GetCurrentUserId()
+        {
+            var userIdClaim = User.FindFirst("userId")?.Value ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            return Guid.TryParse(userIdClaim, out var userId) ? userId : null;
         }
     }
 }

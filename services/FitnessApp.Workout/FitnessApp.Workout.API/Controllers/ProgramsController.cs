@@ -36,6 +36,7 @@ public class ProgramsController : ControllerBase
 
         var query = new GetActiveProgramQuery(userId.Value);
         var result = await _mediator.Send(query);
+        if (result == null) return NotFound();
         return Ok(result);
     }
 

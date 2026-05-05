@@ -26,6 +26,7 @@ namespace FitnessApp.Identity.Application.UseCases.Auth.Register
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILogger<RegisterCommandHandler> _logger;
+        private readonly MassTransit.IPublishEndpoint _publishEndpoint;
 
         public RegisterCommandHandler(
             IUserRepository userRepository,
@@ -35,7 +36,8 @@ namespace FitnessApp.Identity.Application.UseCases.Auth.Register
             IEmailService emailService,
             IUnitOfWork unitOfWork,
             IMapper mapper,
-            ILogger<RegisterCommandHandler> logger)
+            ILogger<RegisterCommandHandler> logger,
+            MassTransit.IPublishEndpoint publishEndpoint)
         {
             _userRepository = userRepository;
             _roleRepository = roleRepository;
@@ -45,6 +47,7 @@ namespace FitnessApp.Identity.Application.UseCases.Auth.Register
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
+            _publishEndpoint = publishEndpoint;
         }
 
         public async Task<AuthResponse> Handle(RegisterCommand request, CancellationToken cancellationToken)
@@ -91,7 +94,16 @@ namespace FitnessApp.Identity.Application.UseCases.Auth.Register
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            _logger.LogInformation("User and tokens saved successfully: {UserId}", user.Id);
+            // Publish Event to RabbitMQ
+            await _publishEndpoint.Publish(new FitnessApp.Identity.Application.Common.Messaging.UserCreatedEvent
+            {
+                UserId = user.Id,
+                Email = user.Email.Value,
+                FullName = $"{user.FirstName} {user.LastName}",
+                Role = "User"
+            }, cancellationToken);
+
+            _logger.LogInformation("User saved and event published: {UserId}", user.Id);
 
             _ = _emailService.SendEmailConfirmationAsync(request.Email, "confirmation-token-placeholder");
 
