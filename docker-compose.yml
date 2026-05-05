@@ -6,6 +6,10 @@ services:
         context: ./services/FitnessApp.Identity      
         dockerfile: FitnessApp.Identity.API/Dockerfile
     container_name: fitness-identity-api
+    deploy:
+      resources:
+        limits:
+          memory: 400M
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
@@ -14,6 +18,7 @@ services:
       - JwtSettings__Secret=your-super-secret-key-at-least-32-characters-long-change-in-production
       - JwtSettings__Issuer=FitnessApp.Identity
       - JwtSettings__Audience=FitnessApp
+      - RabbitMQ__Host=rabbitmq
     ports:
       - "5000:8080"
     depends_on:
@@ -21,6 +26,8 @@ services:
         condition: service_healthy
       fitness-identity-redis:
         condition: service_started
+      rabbitmq:
+        condition: service_healthy
     networks:
       - fitness-network
     restart: unless-stopped
@@ -28,6 +35,10 @@ services:
   fitness-identity-db:
     image: postgres:15-alpine
     container_name: fitness-identity-db
+    deploy:
+      resources:
+        limits:
+          memory: 128M
     environment:
       - POSTGRES_DB=fitness_identity_dev
       - POSTGRES_USER=postgres
@@ -48,6 +59,10 @@ services:
   fitness-identity-redis:
     image: redis:7-alpine
     container_name: fitness-identity-redis
+    deploy:
+      resources:
+        limits:
+          memory: 64M
     ports:
       - "6380:6379"
     networks:
@@ -59,6 +74,10 @@ services:
         context: ./services/FitnessApp.Workout
         dockerfile: FitnessApp.Workout.API/Dockerfile
     container_name: fitness-workout-api
+    deploy:
+      resources:
+        limits:
+          memory: 400M
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
@@ -78,6 +97,10 @@ services:
   fitness-workout-db:
     image: postgres:15-alpine
     container_name: fitness-workout-db
+    deploy:
+      resources:
+        limits:
+          memory: 128M
     environment:
       - POSTGRES_DB=fitness_workout_dev
       - POSTGRES_USER=postgres
@@ -100,6 +123,10 @@ services:
         context: ./services/FitnessApp.Nutrition
         dockerfile: FitnessApp.Nutrition.API/Dockerfile
     container_name: fitness-nutrition-api
+    deploy:
+      resources:
+        limits:
+          memory: 400M
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
@@ -119,6 +146,10 @@ services:
   fitness-nutrition-db:
     image: postgres:15-alpine
     container_name: fitness-nutrition-db
+    deploy:
+      resources:
+        limits:
+          memory: 128M
     environment:
       - POSTGRES_DB=fitness_nutrition_dev
       - POSTGRES_USER=postgres
@@ -136,10 +167,83 @@ services:
       timeout: 5s
       retries: 5
 
+  fitness-communication-api:
+    build:
+        context: ./services/FitnessApp.Communication      
+        dockerfile: FitnessApp.Communication.API/Dockerfile
+    container_name: fitness-communication-api
+    deploy:
+      resources:
+        limits:
+          memory: 400M
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=fitness-communication-db;Port=5432;Database=fitness_communication_dev;Username=postgres;Password=1234;Pooling=true;
+      - RabbitMQ__Host=rabbitmq
+      - TZ=Europe/Kyiv
+    ports:
+      - "5003:8080"
+    depends_on:
+      fitness-communication-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - fitness-network
+    restart: unless-stopped
+
+  fitness-communication-db:
+    image: postgres:15-alpine
+    container_name: fitness-communication-db
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    environment:
+      - POSTGRES_DB=fitness_communication_dev
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=1234
+    ports:
+      - "5436:5432"
+    volumes:
+      - fitness_communication_data:/var/lib/postgresql/data
+    networks:
+      - fitness-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d fitness_communication_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    networks:
+      - fitness-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_running"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   fitness_identity_data:
   fitness_workout_data:
   fitness_nutrition_data:
+  fitness_communication_data:
 
 networks:
   fitness-network:
