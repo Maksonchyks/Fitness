@@ -165,7 +165,6 @@ using (var scope = app.Services.CreateScope())
     foreach (var user in users)
     {
         user.SetOnlineStatus(false);
-        user.SetActiveStatus(true); // Ensure all existing users are visible after fix
     }
     await userRepository.SaveChangesAsync(default);
 }

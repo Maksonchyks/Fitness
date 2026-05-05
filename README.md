@@ -64,7 +64,7 @@
 1. Переконайтеся, що у вас встановлено **Docker** та **Docker Compose**.
 2. Клонуйте репозиторій:
    ```bash
-   git clone https://github.com/your-repo/FitnessApp.git
+   git clone https://github.com/Maksonchyks/Fitness.git
    ```
 3. Запустіть інфраструктуру та сервіси:
    ```bash
