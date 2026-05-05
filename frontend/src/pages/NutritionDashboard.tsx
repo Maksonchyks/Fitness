@@ -1,20 +1,39 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { 
+  Activity, 
+  Apple, 
+  LayoutDashboard, 
+  Target, 
+  Scale, 
+  Plus, 
+  Trash2, 
+  ChevronLeft,
+  Flame,
+  Utensils,
+  History,
+  TrendingUp,
+  TrendingDown,
+  Info,
+  CheckCircle2,
+  Calendar,
+  X
+} from 'lucide-react';
 import './NutritionDashboard.css';
 import * as api from '../services/nutritionApi';
 import type { DailyProgress, MealPlanTemplate, WeightLogEntry } from '../services/nutritionApi';
 
-const MEAL_TYPES: Record<string, { label: string; emoji: string; color: string }> = {
-  Breakfast: { label: 'Сніданок', emoji: '🌅', color: '#f59e0b' },
-  Lunch: { label: 'Обід', emoji: '☀️', color: '#10b981' },
-  Dinner: { label: 'Вечеря', emoji: '🌙', color: '#8b5cf6' },
-  Snack: { label: 'Перекус', emoji: '🍎', color: '#06b6d4' },
+const MEAL_TYPES: Record<string, { label: string; icon: any; color: string }> = {
+  Breakfast: { label: 'Сніданок', icon: Apple, color: '#f59e0b' },
+  Lunch: { label: 'Обід', icon: Utensils, color: '#10b981' },
+  Dinner: { label: 'Вечеря', icon: Activity, color: '#8b5cf6' },
+  Snack: { label: 'Перекус', icon: Flame, color: '#06b6d4' },
 };
 
 const GOAL_OPTIONS = [
-  { value: 0, label: 'Схуднення', emoji: '🔥' },
-  { value: 1, label: 'Набір маси', emoji: '💪' },
-  { value: 2, label: 'Підтримка', emoji: '⚖️' },
+  { value: 0, label: 'Схуднення', icon: Flame },
+  { value: 1, label: 'Набір маси', icon: TrendingUp },
+  { value: 2, label: 'Підтримка', icon: Scale },
 ];
 
 const NutritionDashboard = () => {
@@ -123,108 +142,149 @@ const NutritionDashboard = () => {
   const fmtDateShort = (d: string) => new Date(d).toLocaleDateString('uk-UA', { day: 'numeric', month: 'short' });
 
   if (loading) return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-      <div style={{ width: 48, height: 48, border: '3px solid var(--glass-border)', borderTopColor: 'var(--primary)', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: 'var(--bg-darker)' }}>
+      <div className="animate-spin" style={{ width: 48, height: 48, border: '3px solid var(--glass-border)', borderTopColor: 'var(--primary)', borderRadius: '50%' }} />
     </div>
   );
 
   return (
     <div className="nutrition-page">
-      <header className="nutrition-header">
-        <h1>
-          <span style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(30,41,59,0.7)', border: '1px solid var(--glass-border)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>🥗</span>
-          Харчування
-        </h1>
-        <button onClick={() => navigate('/profile')} className="btn btn-outline" style={{ padding: '0.5rem 1rem', width: 'auto' }}>
-          ← Профіль
-        </button>
+      <header className="nutrition-header animate-fade-in" style={{ marginBottom: '2rem' }}>
+        <div>
+          <h1 className="flex items-center gap-4">
+            <div style={{ 
+              width: 52, 
+              height: 52, 
+              borderRadius: 16, 
+              background: 'linear-gradient(135deg, var(--primary), #60a5fa)', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              boxShadow: '0 10px 20px -5px rgba(59, 130, 246, 0.5)'
+            }}>
+              <Apple className="text-white" size={28} />
+            </div>
+            Харчування
+          </h1>
+          <p className="text-muted mt-2" style={{ marginLeft: 68 }}>Ваш особистий щоденник нутрієнтів</p>
+        </div>
       </header>
 
       <main className="nutrition-main">
-        <div className="nutrition-tabs">
-          {([['diary', '📊', 'Щоденник'], ['templates', '🍽️', 'Шаблони'], ['weight', '⚖️', 'Вага'], ['target', '🎯', 'Ціль КБЖВ']] as const).map(([key, icon, label]) => (
+        <div className="nutrition-tabs animate-fade-in delay-100">
+          {[
+            { key: 'diary', icon: LayoutDashboard, label: 'Щоденник' },
+            { key: 'templates', icon: Utensils, label: 'Шаблони' },
+            { key: 'weight', icon: Scale, label: 'Вага' },
+            { key: 'target', icon: Target, label: 'Ціль КБЖВ' }
+          ].map(({ key, icon: Icon, label }) => (
             <button key={key} className={tab === key ? 'active' : ''} onClick={() => setTab(key as any)}>
-              {icon} {label}
+              <Icon size={18} /> {label}
             </button>
           ))}
         </div>
 
         {error && (
-          <div style={{ padding: '1rem', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 12, color: '#fca5a5', marginBottom: '1.5rem' }}>
-            {error}
+          <div className="animate-fade-in" style={{ padding: '1rem 1.5rem', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 16, color: '#fca5a5', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <X size={18} /> {error}
           </div>
         )}
 
         {/* ── DIARY TAB ── */}
         {tab === 'diary' && progress && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <div className="flex flex-col gap-8 animate-fade-in delay-200">
             {/* Adjustment Banner */}
             {progress.adjustment && (
               <div className={`adjustment-banner ${progress.adjustment.adjustmentPercent < 0 ? 'loss' : 'gain'}`}>
-                <span style={{ fontSize: '1.5rem' }}>{progress.adjustment.adjustmentPercent < 0 ? '📉' : '📈'}</span>
+                <div style={{ 
+                  width: 48, height: 48, borderRadius: 12, 
+                  background: progress.adjustment.adjustmentPercent < 0 ? 'rgba(245,158,11,0.2)' : 'rgba(59,130,246,0.2)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}>
+                  {progress.adjustment.adjustmentPercent < 0 ? <TrendingDown className="text-orange-400" /> : <TrendingUp className="text-blue-400" />}
+                </div>
                 <div style={{ flex: 1 }}>
                   <p>{progress.adjustment.message}</p>
-                  <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: '0 0 0.75rem' }}>
-                    Рекомендована зміна: <strong style={{ color: progress.adjustment.adjustmentPercent < 0 ? '#f59e0b' : '#3b82f6' }}>
-                    {progress.adjustment.adjustmentPercent > 0 ? '+' : ''}{progress.adjustment.adjustmentPercent.toFixed(1)}%</strong> →{' '}
-                    {progress.adjustment.suggestedTarget.calories.toFixed(0)} kcal
-                  </p>
-                  <button onClick={handleApplyAdjustment} className="btn btn-primary" style={{ width: 'auto', padding: '0.5rem 1.25rem', fontSize: '0.85rem' }}>
-                    ✅ Застосувати
-                  </button>
+                  <div className="flex items-center gap-4 mt-3">
+                    <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                      Рекомендована зміна: <strong style={{ color: progress.adjustment.adjustmentPercent < 0 ? '#f59e0b' : '#3b82f6' }}>
+                      {progress.adjustment.adjustmentPercent > 0 ? '+' : ''}{progress.adjustment.adjustmentPercent.toFixed(1)}%</strong>
+                    </span>
+                    <button onClick={handleApplyAdjustment} className="btn btn-primary" style={{ width: 'auto', padding: '0.4rem 1rem', fontSize: '0.85rem', borderRadius: 10 }}>
+                      <CheckCircle2 size={16} className="mr-2" /> Застосувати {progress.adjustment.suggestedTarget.calories.toFixed(0)} ккал
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
 
             {/* Progress Cards */}
-            <div className="glass-panel" style={{ padding: '1.5rem' }}>
-              <h2 style={{ fontSize: '1.2rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                📊 Денний прогрес
-              </h2>
+            <div className="glass-panel" style={{ padding: '2rem' }}>
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="flex items-center gap-3" style={{ fontSize: '1.4rem', fontWeight: 700 }}>
+                  <Activity className="text-primary" size={24} /> Денний прогрес
+                </h2>
+                <div className="text-muted text-sm flex items-center gap-2">
+                  <Calendar size={14} /> Сьогодні, {new Date().toLocaleDateString('uk-UA', { day: 'numeric', month: 'long' })}
+                </div>
+              </div>
+              
               <div className="progress-grid">
                 {[
-                  { label: 'Калорії', val: progress.consumed.calories, tgt: progress.target?.calories, pct: progress.progress?.caloriesPercent, unit: 'kcal', color: '#f59e0b' },
-                  { label: 'Білки', val: progress.consumed.proteins, tgt: progress.target?.proteins, pct: progress.progress?.proteinsPercent, unit: 'г', color: '#ef4444' },
-                  { label: 'Жири', val: progress.consumed.fats, tgt: progress.target?.fats, pct: progress.progress?.fatsPercent, unit: 'г', color: '#f59e0b' },
-                  { label: 'Вуглеводи', val: progress.consumed.carbs, tgt: progress.target?.carbs, pct: progress.progress?.carbsPercent, unit: 'г', color: '#3b82f6' },
+                  { label: 'Калорії', val: progress.consumed.calories, tgt: progress.target?.calories, pct: progress.progress?.caloriesPercent, unit: 'ккал', color: '#f59e0b', icon: Flame },
+                  { label: 'Білки', val: progress.consumed.proteins, tgt: progress.target?.proteins, pct: progress.progress?.proteinsPercent, unit: 'г', color: '#ef4444', icon: Activity },
+                  { label: 'Жири', val: progress.consumed.fats, tgt: progress.target?.fats, pct: progress.progress?.fatsPercent, unit: 'г', color: '#fbbf24', icon: Apple },
+                  { label: 'Вуглеводи', val: progress.consumed.carbs, tgt: progress.target?.carbs, pct: progress.progress?.carbsPercent, unit: 'г', color: '#3b82f6', icon: Utensils },
                 ].map(m => (
                   <div className="progress-card" key={m.label}>
-                    <div className="label">{m.label}</div>
-                    <div className="value" style={{ color: m.color }}>{m.val.toFixed(0)}<span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}> {m.unit}</span></div>
-                    {m.tgt != null && <div className="target">з {m.tgt.toFixed(0)} {m.unit}</div>}
+                    <div className="label flex items-center gap-2">
+                      <m.icon size={14} style={{ color: m.color }} />
+                      {m.label}
+                    </div>
+                    <div className="value">{m.val.toFixed(0)}<span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 400 }}> {m.unit}</span></div>
+                    {m.tgt != null && <div className="target">Ціль: {m.tgt.toFixed(0)} {m.unit}</div>}
                     {m.pct != null && (
                       <div className="progress-bar-bg">
-                        <div className="progress-bar-fill" style={{ width: `${Math.min(m.pct, 100)}%`, background: pctColor(m.pct) }} />
+                        <div className="progress-bar-fill" style={{ width: `${Math.min(m.pct, 100)}%`, background: m.color }} />
                       </div>
                     )}
-                    {m.pct != null && <div style={{ fontSize: '0.7rem', color: pctColor(m.pct), marginTop: 4 }}>{m.pct.toFixed(0)}%</div>}
+                    {m.pct != null && (
+                      <div className="flex justify-between mt-2">
+                        <span style={{ fontSize: '0.75rem', color: pctColor(m.pct), fontWeight: 700 }}>{m.pct.toFixed(0)}%</span>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{Math.max(0, (m.tgt || 0) - m.val).toFixed(0)} залишилось</span>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
               {!progress.target && (
-                <button onClick={() => setTab('target')} className="btn btn-outline" style={{ width: 'auto', padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
-                  🎯 Встановити ціль КБЖВ
-                </button>
+                <div style={{ textAlign: 'center', padding: '1rem', background: 'rgba(59,130,246,0.05)', borderRadius: 16, border: '1px dashed rgba(59,130,246,0.3)' }}>
+                  <p className="text-muted mb-4">Ціль КБЖВ ще не встановлена. Це допоможе нам краще відстежувати ваш прогрес.</p>
+                  <button onClick={() => setTab('target')} className="btn btn-primary" style={{ width: 'auto' }}>
+                    <Target size={18} className="mr-2" /> Встановити ціль
+                  </button>
+                </div>
               )}
             </div>
 
             {/* Add Meal */}
-            <div className="glass-panel" style={{ padding: '1.5rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <h2 style={{ fontSize: '1.2rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>🍽️ Прийоми їжі</h2>
-                <button onClick={() => setShowMealForm(!showMealForm)} className="btn btn-primary" style={{ width: 'auto', padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
-                  {showMealForm ? '✕ Закрити' : '+ Додати'}
+            <div className="glass-panel" style={{ padding: '2rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                <h2 className="flex items-center gap-3" style={{ fontSize: '1.4rem', fontWeight: 700 }}>
+                  <Utensils className="text-primary" size={24} /> Прийоми їжі
+                </h2>
+                <button onClick={() => setShowMealForm(!showMealForm)} className="btn btn-primary" style={{ width: 'auto', padding: '0.6rem 1.25rem', borderRadius: 14 }}>
+                  {showMealForm ? <><X size={18} className="mr-2" /> Закрити</> : <><Plus size={18} className="mr-2" /> Додати страву</>}
                 </button>
               </div>
 
               {showMealForm && (
-                <form onSubmit={handleLogMeal} className="log-form" style={{ marginBottom: '1.5rem', padding: '1.25rem', background: 'rgba(59,130,246,0.05)', borderRadius: 14, border: '1px solid rgba(59,130,246,0.15)' }}>
-                  <div className="full-width form-group" style={{ marginBottom: 0 }}>
+                <form onSubmit={handleLogMeal} className="log-form animate-fade-in" style={{ marginBottom: '2rem', padding: '2rem', background: 'rgba(255,255,255,0.02)', borderRadius: 24, border: '1px solid var(--glass-border)' }}>
+                  <div className="full-width form-group">
                     <label className="form-label">Назва страви</label>
-                    <input className="form-input" value={mealName} onChange={e => setMealName(e.target.value)} placeholder="напр. Вівсянка з бананом" required />
+                    <input className="form-input" value={mealName} onChange={e => setMealName(e.target.value)} placeholder="Введіть назву страви..." required />
                   </div>
-                  <div className="form-group" style={{ marginBottom: 0 }}>
+                  <div className="form-group">
                     <label className="form-label">Тип прийому</label>
                     <select className="form-input" value={mealType} onChange={e => setMealType(+e.target.value)}>
                       <option value={0}>🌅 Сніданок</option>
@@ -233,25 +293,25 @@ const NutritionDashboard = () => {
                       <option value={3}>🍎 Перекус</option>
                     </select>
                   </div>
-                  <div className="form-group" style={{ marginBottom: 0 }}>
-                    <label className="form-label">Калорії (kcal)</label>
-                    <input type="number" className="form-input" value={cal} onChange={e => setCal(e.target.value)} placeholder="350" required min="0" />
+                  <div className="form-group">
+                    <label className="form-label">Калорії (ккал)</label>
+                    <input type="number" className="form-input" value={cal} onChange={e => setCal(e.target.value)} placeholder="0" required min="0" />
                   </div>
-                  <div className="form-group" style={{ marginBottom: 0 }}>
+                  <div className="form-group">
                     <label className="form-label">Білки (г)</label>
-                    <input type="number" className="form-input" value={prot} onChange={e => setProt(e.target.value)} placeholder="20" required min="0" />
+                    <input type="number" className="form-input" value={prot} onChange={e => setProt(e.target.value)} placeholder="0" required min="0" />
                   </div>
-                  <div className="form-group" style={{ marginBottom: 0 }}>
+                  <div className="form-group">
                     <label className="form-label">Жири (г)</label>
-                    <input type="number" className="form-input" value={fat} onChange={e => setFat(e.target.value)} placeholder="12" required min="0" />
+                    <input type="number" className="form-input" value={fat} onChange={e => setFat(e.target.value)} placeholder="0" required min="0" />
                   </div>
-                  <div className="form-group" style={{ marginBottom: 0 }}>
+                  <div className="form-group">
                     <label className="form-label">Вуглеводи (г)</label>
-                    <input type="number" className="form-input" value={carb} onChange={e => setCarb(e.target.value)} placeholder="45" required min="0" />
+                    <input type="number" className="form-input" value={carb} onChange={e => setCarb(e.target.value)} placeholder="0" required min="0" />
                   </div>
-                  <div className="full-width">
-                    <button type="submit" className="btn btn-primary" disabled={submitting} style={{ marginTop: '0.5rem' }}>
-                      {submitting ? '⏳ Зберігаю...' : '✅ Зберегти запис'}
+                  <div className="full-width mt-4">
+                    <button type="submit" className="btn btn-primary" disabled={submitting}>
+                      {submitting ? 'Зберігаю...' : 'Зберегти страву'}
                     </button>
                   </div>
                 </form>
@@ -259,28 +319,53 @@ const NutritionDashboard = () => {
 
               <div className="meal-list">
                 {progress.meals.length === 0 ? (
-                  <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem 0' }}>Ще немає записів за сьогодні. Додайте перший прийом їжі! 🍽️</p>
+                  <div style={{ textAlign: 'center', padding: '4rem 0', background: 'rgba(255,255,255,0.01)', borderRadius: 24, border: '1px dashed var(--glass-border)' }}>
+                    <div style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}>🍽️</div>
+                    <h3 className="text-muted">Ще немає записів за сьогодні</h3>
+                    <p className="text-sm text-muted mt-2">Ваш денний раціон з\'явиться тут після додавання страв</p>
+                  </div>
                 ) : progress.meals.map(meal => {
-                  const mt = MEAL_TYPES[meal.mealType] || { label: meal.mealType, emoji: '🍽️', color: '#6b7280' };
+                  const mt = MEAL_TYPES[meal.mealType] || { label: meal.mealType, icon: Utensils, color: '#6b7280' };
                   return (
                     <div className="meal-item" key={meal.id}>
-                      <div className="meal-info">
-                        <h4>{mt.emoji} {meal.mealName}</h4>
-                        <div className="meal-meta">
-                          <span style={{ padding: '0.1rem 0.5rem', borderRadius: 999, background: `${mt.color}18`, color: mt.color, fontSize: '0.75rem', fontWeight: 600 }}>
-                            {mt.label}
-                          </span>
-                          <span style={{ marginLeft: '0.5rem' }}>{fmtDate(meal.loggedAt)}</span>
+                      <div className="flex items-center gap-4">
+                        <div style={{ 
+                          width: 44, height: 44, borderRadius: 12, 
+                          background: `${mt.color}15`, color: mt.color,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center'
+                        }}>
+                          <mt.icon size={20} />
+                        </div>
+                        <div className="meal-info">
+                          <h4>{meal.mealName}</h4>
+                          <div className="meal-meta flex items-center gap-3">
+                            <span style={{ fontWeight: 600, color: mt.color }}>{mt.label}</span>
+                            <span className="flex items-center gap-1"><History size={12} /> {fmtDate(meal.loggedAt)}</span>
+                          </div>
                         </div>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                      <div className="flex items-center gap-6">
                         <div className="meal-macros">
-                          <span>🔥 <strong>{meal.nutrition.calories.toFixed(0)}</strong></span>
-                          <span>Б: <strong>{meal.nutrition.proteins.toFixed(0)}</strong></span>
-                          <span>Ж: <strong>{meal.nutrition.fats.toFixed(0)}</strong></span>
-                          <span>В: <strong>{meal.nutrition.carbs.toFixed(0)}</strong></span>
+                          <div className="flex flex-col items-center">
+                            <span className="text-xs text-muted">ккал</span>
+                            <strong>{meal.nutrition.calories.toFixed(0)}</strong>
+                          </div>
+                          <div className="flex flex-col items-center">
+                            <span className="text-xs text-muted">Б</span>
+                            <strong>{meal.nutrition.proteins.toFixed(0)}</strong>
+                          </div>
+                          <div className="flex flex-col items-center">
+                            <span className="text-xs text-muted">Ж</span>
+                            <strong>{meal.nutrition.fats.toFixed(0)}</strong>
+                          </div>
+                          <div className="flex flex-col items-center">
+                            <span className="text-xs text-muted">В</span>
+                            <strong>{meal.nutrition.carbs.toFixed(0)}</strong>
+                          </div>
                         </div>
-                        <button className="delete-btn" onClick={() => handleDeleteMeal(meal.id)} title="Видалити">🗑️</button>
+                        <button className="delete-btn" onClick={() => handleDeleteMeal(meal.id)} style={{ padding: '0.6rem', background: 'rgba(239,68,68,0.05)', border: '1px solid rgba(239,68,68,0.1)', borderRadius: 12, color: '#ef4444' }}>
+                          <Trash2 size={16} />
+                        </button>
                       </div>
                     </div>
                   );
@@ -292,54 +377,74 @@ const NutritionDashboard = () => {
 
         {/* ── TEMPLATES TAB ── */}
         {tab === 'templates' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <div className="glass-panel" style={{ padding: '1.5rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
-                <h2 style={{ fontSize: '1.2rem', fontWeight: 600, margin: 0 }}>🍽️ Шаблони харчування</h2>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <button onClick={handleNextTemplate} className="btn btn-primary" style={{ width: 'auto', padding: '0.5rem 1.25rem', fontSize: '0.85rem' }}>
-                    🔀 Наступний шаблон
+          <div className="flex flex-col gap-6 animate-fade-in delay-200">
+            <div className="glass-panel" style={{ padding: '2rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+                <h2 className="flex items-center gap-3" style={{ fontSize: '1.4rem', fontWeight: 700 }}>
+                  <Utensils className="text-primary" size={24} /> Шаблони харчування
+                </h2>
+                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                  <button onClick={handleNextTemplate} className="btn btn-primary" style={{ width: 'auto', padding: '0.6rem 1.25rem' }}>
+                    <Plus size={18} className="mr-2" /> Наступний шаблон
                   </button>
-                  <button onClick={handleResetQueue} className="btn btn-outline" style={{ width: 'auto', padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
-                    🔄 Скинути
+                  <button onClick={handleResetQueue} className="btn btn-outline" style={{ width: 'auto', padding: '0.6rem 1rem' }}>
+                    <History size={18} className="mr-2" /> Скинути чергу
                   </button>
                 </div>
               </div>
 
               {!template ? (
-                <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
-                  <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🍽️</div>
-                  <h3 style={{ fontWeight: 600, marginBottom: '0.5rem' }}>Отримайте ідею для харчування</h3>
-                  <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Натисніть «Наступний шаблон» щоб побачити план на день з 30 доступних варіантів</p>
+                <div style={{ textAlign: 'center', padding: '5rem 1rem' }}>
+                  <div style={{ 
+                    width: 80, height: 80, borderRadius: 24, 
+                    background: 'rgba(59,130,246,0.05)', 
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    margin: '0 auto 2rem'
+                  }}>
+                    <Utensils className="text-primary" size={40} />
+                  </div>
+                  <h3 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem' }}>Знайдіть ідеальну дієту</h3>
+                  <p className="text-muted" style={{ maxWidth: 400, margin: '0 auto 2rem' }}>Ми підготували понад 30 збалансованих шаблонів для різних цілей та смаків.</p>
+                  <button onClick={handleNextTemplate} className="btn btn-primary" style={{ width: 'auto' }}>Почати огляд</button>
                 </div>
               ) : (
-                <div className="template-card" style={{ padding: 0 }}>
+                <div className="template-card animate-fade-in">
                   <div className="template-header">
                     <div>
                       <h3 className="template-name">{template.name}</h3>
-                      <p className="template-desc">{template.description}</p>
+                      <p className="text-muted">{template.description}</p>
                     </div>
                     <div style={{ textAlign: 'right' }}>
-                      <div className="remaining-badge">📋 Залишилось: {template.remainingTemplates}</div>
-                      <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
-                        Σ {template.totalNutrition.calories.toFixed(0)} kcal · Б{template.totalNutrition.proteins.toFixed(0)} · Ж{template.totalNutrition.fats.toFixed(0)} · В{template.totalNutrition.carbs.toFixed(0)}
+                      <div className="remaining-badge" style={{ background: 'rgba(59,130,246,0.1)', color: 'var(--primary)', border: '1px solid rgba(59,130,246,0.2)' }}>
+                        <LayoutDashboard size={14} className="mr-1" /> Залишилось: {template.remainingTemplates}
+                      </div>
+                      <div style={{ fontSize: '0.9rem', fontWeight: 700, marginTop: '1rem', color: 'white' }}>
+                        Загалом: {template.totalNutrition.calories.toFixed(0)} ккал
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+                        Б{template.totalNutrition.proteins.toFixed(0)} · Ж{template.totalNutrition.fats.toFixed(0)} · В{template.totalNutrition.carbs.toFixed(0)}
                       </div>
                     </div>
                   </div>
 
                   <div className="template-meals">
                     {template.meals.map((m, i) => {
-                      const mt = MEAL_TYPES[m.mealType] || { label: m.mealType, emoji: '🍽️', color: '#6b7280' };
+                      const mt = MEAL_TYPES[m.mealType] || { label: m.mealType, icon: Utensils, color: '#6b7280' };
                       return (
                         <div className="template-meal-card" key={i}>
-                          <span className="meal-type-badge" style={{ background: `${mt.color}18`, color: mt.color }}>{mt.emoji} {mt.label}</span>
+                          <div className="flex items-center gap-2 mb-4">
+                            <mt.icon size={16} style={{ color: mt.color }} />
+                            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: mt.color, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{mt.label}</span>
+                          </div>
                           <h4>{m.dishName}</h4>
-                          <p>{m.description}</p>
+                          <p style={{ minHeight: 40 }}>{m.description}</p>
                           <div className="macro-row">
-                            <span>🔥 {m.nutrition.calories.toFixed(0)}</span>
-                            <span>Б: {m.nutrition.proteins.toFixed(0)}г</span>
-                            <span>Ж: {m.nutrition.fats.toFixed(0)}г</span>
-                            <span>В: {m.nutrition.carbs.toFixed(0)}г</span>
+                            <span className="flex items-center gap-1"><Flame size={14} /> {m.nutrition.calories.toFixed(0)}</span>
+                            <div className="flex gap-3">
+                              <span>Б: <strong>{m.nutrition.proteins.toFixed(0)}</strong>г</span>
+                              <span>Ж: <strong>{m.nutrition.fats.toFixed(0)}</strong>г</span>
+                              <span>В: <strong>{m.nutrition.carbs.toFixed(0)}</strong>г</span>
+                            </div>
                           </div>
                         </div>
                       );
@@ -353,28 +458,35 @@ const NutritionDashboard = () => {
 
         {/* ── WEIGHT TAB ── */}
         {tab === 'weight' && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-            <div className="glass-panel" style={{ padding: '1.5rem' }}>
-              <h2 style={{ fontSize: '1.2rem', fontWeight: 600, marginBottom: '1rem' }}>⚖️ Записати вагу</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '2rem' }} className="animate-fade-in delay-200">
+            <div className="glass-panel" style={{ padding: '2rem' }}>
+              <h2 className="flex items-center gap-3 mb-6" style={{ fontSize: '1.4rem', fontWeight: 700 }}>
+                <Scale className="text-primary" size={24} /> Записати вагу
+              </h2>
               <form onSubmit={handleLogWeight}>
                 <div className="form-group">
                   <label className="form-label">Вага (кг)</label>
                   <input type="number" step="0.1" className="form-input" value={weightVal} onChange={e => setWeightVal(e.target.value)} placeholder="напр. 75.5" required min="20" max="400" />
                 </div>
                 <button type="submit" className="btn btn-primary" disabled={submitting}>
-                  {submitting ? '⏳ Зберігаю...' : '✅ Записати'}
+                  {submitting ? 'Зберігаю...' : 'Зберегти запис'}
                 </button>
               </form>
             </div>
-            <div className="glass-panel" style={{ padding: '1.5rem' }}>
-              <h2 style={{ fontSize: '1.2rem', fontWeight: 600, marginBottom: '1rem' }}>📈 Історія ваги (30 днів)</h2>
+            <div className="glass-panel" style={{ padding: '2rem' }}>
+              <h2 className="flex items-center gap-3 mb-6" style={{ fontSize: '1.4rem', fontWeight: 700 }}>
+                <History className="text-primary" size={24} /> Історія (30 днів)
+              </h2>
               {weightHistory.length === 0 ? (
-                <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem 0' }}>Ще немає записів. Почніть відстежувати вагу!</p>
+                <div style={{ textAlign: 'center', padding: '3rem 0' }}>
+                  <Scale className="text-muted" size={40} style={{ opacity: 0.3, marginBottom: '1rem' }} />
+                  <p className="text-muted">Ще немає записів ваги</p>
+                </div>
               ) : (
                 <div className="weight-list">
                   {weightHistory.map(w => (
                     <div className="weight-item" key={w.id}>
-                      <span>{fmtDateShort(w.loggedAt)}</span>
+                      <span className="flex items-center gap-2"><Calendar size={14} className="text-muted" /> {fmtDateShort(w.loggedAt)}</span>
                       <span className="weight-val">{w.weight.toFixed(1)} кг</span>
                     </div>
                   ))}
@@ -386,11 +498,10 @@ const NutritionDashboard = () => {
 
         {/* ── TARGET TAB ── */}
         {tab === 'target' && (() => {
-          // Auto-calc: best-practice macros by goal
-          const RATIOS: Record<number, { p: number; f: number; c: number; label: string; desc: string }> = {
-            0: { p: 30, f: 25, c: 45, label: 'Схуднення', desc: 'Високий білок для збереження м\'язів при дефіциті' },
-            1: { p: 30, f: 20, c: 50, label: 'Набір маси', desc: 'Більше вуглеводів для енергії та відновлення' },
-            2: { p: 25, f: 30, c: 45, label: 'Підтримка', desc: 'Збалансоване співвідношення для здоров\'я' },
+          const RATIOS: Record<number, { p: number; f: number; c: number; label: string; desc: string; icon: any }> = {
+            0: { p: 35, f: 25, c: 40, label: 'Схуднення', desc: 'Високий білок для захисту м\'язів та тривалого насичення.', icon: Flame },
+            1: { p: 25, f: 20, c: 55, label: 'Набір маси', desc: 'Пріоритет вуглеводам для енергії на тренуваннях та росту.', icon: TrendingUp },
+            2: { p: 30, f: 30, c: 40, label: 'Підтримка', desc: 'Оптимальний баланс для здоров\'я та стабільної енергії.', icon: Scale },
           };
           const ratio = RATIOS[tGoal] || RATIOS[2];
           const cals = parseFloat(tCal) || 0;
@@ -401,106 +512,123 @@ const NutritionDashboard = () => {
           const applyRec = () => { setTProt(String(recProt)); setTFat(String(recFat)); setTCarb(String(recCarb)); };
 
           return (
-          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '1.5rem', alignItems: 'start' }}>
-            {/* Left: Form */}
-            <div className="glass-panel" style={{ padding: '2rem' }}>
-              <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-                <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🎯</div>
-                <h2 style={{ fontSize: '1.3rem', fontWeight: 600 }}>Встановити ціль КБЖВ</h2>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Денна норма калорій та макронутрієнтів</p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '2rem', alignItems: 'start' }} className="animate-fade-in delay-200">
+            <div className="glass-panel" style={{ padding: '2.5rem' }}>
+              <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+                <div style={{ 
+                  width: 64, height: 64, borderRadius: 20, 
+                  background: 'rgba(59,130,246,0.1)', 
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  margin: '0 auto 1.5rem'
+                }}>
+                  <Target className="text-primary" size={32} />
+                </div>
+                <h2 style={{ fontSize: '1.6rem', fontWeight: 800 }}>Ціль КБЖВ</h2>
+                <p className="text-muted">Налаштуйте денні норми для досягнення результату</p>
               </div>
               <form onSubmit={handleSetTarget}>
                 <div className="form-group">
-                  <label className="form-label">Ціль</label>
-                  <select className="form-input" value={tGoal} onChange={e => setTGoal(+e.target.value)}>
-                    {GOAL_OPTIONS.map(g => <option key={g.value} value={g.value}>{g.emoji} {g.label}</option>)}
-                  </select>
+                  <label className="form-label">Ваша мета</label>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
+                    {GOAL_OPTIONS.map(g => (
+                      <button 
+                        key={g.value} 
+                        type="button"
+                        onClick={() => setTGoal(g.value)}
+                        style={{ 
+                          padding: '0.75rem 0.5rem', 
+                          borderRadius: 12, 
+                          border: '1px solid',
+                          borderColor: tGoal === g.value ? 'var(--primary)' : 'var(--glass-border)',
+                          background: tGoal === g.value ? 'rgba(59,130,246,0.1)' : 'transparent',
+                          color: tGoal === g.value ? 'white' : 'var(--text-muted)',
+                          fontSize: '0.85rem',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          transition: 'all 0.2s'
+                        }}
+                      >
+                        <g.icon size={16} style={{ marginBottom: 4, display: 'block', margin: '0 auto' }} />
+                        {g.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Калорії (kcal)</label>
-                  <input type="number" className="form-input" value={tCal} onChange={e => setTCal(e.target.value)} placeholder="2000" required min="500" />
+                  <label className="form-label">Денна калорійність (ккал)</label>
+                  <input type="number" className="form-input" value={tCal} onChange={e => setTCal(e.target.value)} placeholder="напр. 2200" required min="500" />
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
                   <div className="form-group">
                     <label className="form-label">Білки (г)</label>
-                    <input type="number" className="form-input" value={tProt} onChange={e => setTProt(e.target.value)} placeholder={String(recProt || '150')} required min="0" />
+                    <input type="number" className="form-input" value={tProt} onChange={e => setTProt(e.target.value)} placeholder={String(recProt || '0')} required min="0" />
                   </div>
                   <div className="form-group">
                     <label className="form-label">Жири (г)</label>
-                    <input type="number" className="form-input" value={tFat} onChange={e => setTFat(e.target.value)} placeholder={String(recFat || '65')} required min="0" />
+                    <input type="number" className="form-input" value={tFat} onChange={e => setTFat(e.target.value)} placeholder={String(recFat || '0')} required min="0" />
                   </div>
                   <div className="form-group">
-                    <label className="form-label">Вуглеводи (г)</label>
-                    <input type="number" className="form-input" value={tCarb} onChange={e => setTCarb(e.target.value)} placeholder={String(recCarb || '250')} required min="0" />
+                    <label className="form-label">Вуглев. (г)</label>
+                    <input type="number" className="form-input" value={tCarb} onChange={e => setTCarb(e.target.value)} placeholder={String(recCarb || '0')} required min="0" />
                   </div>
                 </div>
                 {cals > 0 && (
-                  <button type="button" onClick={applyRec} className="btn btn-outline" style={{ marginBottom: '1rem', fontSize: '0.85rem', padding: '0.5rem 1rem' }}>
-                    ✨ Застосувати рекомендовані БЖВ
+                  <button type="button" onClick={applyRec} className="btn btn-outline" style={{ marginBottom: '1.5rem', fontSize: '0.85rem', padding: '0.75rem', borderColor: 'rgba(59,130,246,0.3)', color: '#60a5fa' }}>
+                    <Activity size={16} className="mr-2" /> Розрахувати за рекомендацією
                   </button>
                 )}
                 <button type="submit" className="btn btn-primary" disabled={submitting}>
-                  {submitting ? '⏳ Зберігаю...' : '💾 Зберегти ціль'}
+                  {submitting ? 'Збереження...' : 'Зберегти цілі'}
                 </button>
               </form>
             </div>
 
-            {/* Right: Recommendation panel */}
-            <div className="glass-panel" style={{ padding: '1.5rem', border: '1px solid rgba(16,185,129,0.25)' }}>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                🏋️ Рекомендації для спортсменів
-              </h3>
+            <div className="glass-panel" style={{ padding: '2rem', border: '1px solid rgba(59,130,246,0.2)' }}>
+              <div className="flex items-center gap-3 mb-6">
+                <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(59,130,246,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Info className="text-primary" size={20} />
+                </div>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 700 }}>Поради дієтолога</h3>
+              </div>
 
               {cals > 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                  <div style={{ padding: '1rem', background: 'rgba(16,185,129,0.06)', borderRadius: 12, border: '1px solid rgba(16,185,129,0.15)' }}>
-                    <div style={{ fontSize: '0.78rem', color: '#10b981', fontWeight: 600, marginBottom: '0.5rem' }}>
-                      {ratio.label} · {ratio.p}/{ratio.f}/{ratio.c}%
+                <div className="flex flex-col gap-6">
+                  <div style={{ padding: '1.5rem', background: 'rgba(255,255,255,0.02)', borderRadius: 20, border: '1px solid var(--glass-border)' }}>
+                    <div className="flex items-center gap-2 mb-3">
+                      <ratio.icon size={18} className="text-primary" />
+                      <span style={{ fontWeight: 700, fontSize: '1rem' }}>{ratio.label}</span>
                     </div>
-                    <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: '0 0 0.75rem', lineHeight: 1.5 }}>
+                    <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: '1.5rem' }}>
                       {ratio.desc}
                     </p>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <div className="flex flex-col gap-3">
                       {[
-                        { label: 'Білки', val: recProt, unit: 'г', pct: ratio.p, color: '#ef4444', info: `${ratio.p}% × ${cals} kcal ÷ 4` },
-                        { label: 'Жири', val: recFat, unit: 'г', pct: ratio.f, color: '#f59e0b', info: `${ratio.f}% × ${cals} kcal ÷ 9` },
-                        { label: 'Вуглеводи', val: recCarb, unit: 'г', pct: ratio.c, color: '#3b82f6', info: `${ratio.c}% × ${cals} kcal ÷ 4` },
+                        { label: 'Білки', val: recProt, pct: ratio.p, color: '#ef4444' },
+                        { label: 'Жири', val: recFat, pct: ratio.f, color: '#fbbf24' },
+                        { label: 'Вуглеводи', val: recCarb, pct: ratio.c, color: '#3b82f6' },
                       ].map(m => (
-                        <div key={m.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
+                        <div key={m.label} className="flex justify-between items-center p-3" style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 12 }}>
                           <div>
-                            <span style={{ fontWeight: 600, color: m.color }}>{m.label}</span>
-                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginLeft: '0.5rem' }}>{m.info}</span>
+                            <div style={{ fontSize: '0.85rem', fontWeight: 700 }}>{m.label}</div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{m.pct}% від раціону</div>
                           </div>
-                          <span style={{ fontWeight: 700, color: 'white' }}>{m.val}{m.unit}</span>
+                          <div style={{ fontSize: '1.1rem', fontWeight: 800, color: m.color }}>{m.val}г</div>
                         </div>
                       ))}
                     </div>
                   </div>
-
-                  <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
-                    <strong style={{ color: 'var(--text-main)' }}>Формула:</strong><br />
-                    Білки = {ratio.p}% від kcal ÷ 4 kcal/г<br />
-                    Жири = {ratio.f}% від kcal ÷ 9 kcal/г<br />
-                    Вуглеводи = {ratio.c}% від kcal ÷ 4 kcal/г
+                  
+                  <div style={{ padding: '1rem', background: 'rgba(59,130,246,0.05)', borderRadius: 14, fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                    <strong>Як ми рахуємо:</strong><br />
+                    1г білка = 4 ккал | 1г вуглеводів = 4 ккал | 1г жиру = 9 ккал
                   </div>
                 </div>
               ) : (
-                <div style={{ textAlign: 'center', padding: '2rem 0.5rem' }}>
-                  <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📊</div>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', lineHeight: 1.6 }}>
-                    Введіть кількість калорій зліва, і ми автоматично розрахуємо оптимальне співвідношення БЖВ для вашої цілі
-                  </p>
+                <div style={{ textAlign: 'center', padding: '4rem 1rem' }}>
+                  <Target size={48} className="text-muted" style={{ opacity: 0.2, marginBottom: '1.5rem' }} />
+                  <p className="text-muted">Введіть калорійність, щоб отримати персоналізовані розрахунки</p>
                 </div>
               )}
-
-              <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(59,130,246,0.06)', borderRadius: 10, border: '1px solid rgba(59,130,246,0.15)' }}>
-                <div style={{ fontSize: '0.78rem', fontWeight: 600, color: '#3b82f6', marginBottom: '0.3rem' }}>💡 Відсоткові норми</div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
-                  <strong>Схуднення:</strong> Б30/Ж25/В45 — більше білка<br />
-                  <strong>Набір маси:</strong> Б30/Ж20/В50 — більше вуглеводів<br />
-                  <strong>Підтримка:</strong> Б25/Ж30/В45 — баланс
-                </div>
-              </div>
             </div>
           </div>
           );
@@ -511,3 +639,4 @@ const NutritionDashboard = () => {
 };
 
 export default NutritionDashboard;
+
