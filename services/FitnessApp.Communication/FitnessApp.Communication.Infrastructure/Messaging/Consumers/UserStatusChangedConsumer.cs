@@ -21,7 +21,7 @@ namespace FitnessApp.Communication.Infrastructure.Messaging.Consumers
 
             if (user != null)
             {
-                user.SetStatus(message.IsActive);
+                user.SetActiveStatus(message.IsActive);
                 await _userRepository.UpdateAsync(user, context.CancellationToken);
                 await _userRepository.SaveChangesAsync(context.CancellationToken);
             }

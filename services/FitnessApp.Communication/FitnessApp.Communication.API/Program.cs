@@ -164,7 +164,8 @@ using (var scope = app.Services.CreateScope())
     var users = await userRepository.GetAllAsync(default);
     foreach (var user in users)
     {
-        user.SetStatus(false);
+        user.SetOnlineStatus(false);
+        user.SetActiveStatus(true); // Ensure all existing users are visible after fix
     }
     await userRepository.SaveChangesAsync(default);
 }

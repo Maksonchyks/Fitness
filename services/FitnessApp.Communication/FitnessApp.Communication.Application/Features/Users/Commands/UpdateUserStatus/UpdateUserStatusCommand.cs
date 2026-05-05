@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FitnessApp.Communication.Application.Features.Users.Commands.UpdateUserStatus
 {
-    public record UpdateUserStatusCommand(Guid UserId, bool IsActive) : IRequest;
+    public record UpdateUserStatusCommand(Guid UserId, bool IsOnline) : IRequest;
 
     public class UpdateUserStatusCommandHandler : IRequestHandler<UpdateUserStatusCommand>
     {
@@ -24,11 +24,11 @@ namespace FitnessApp.Communication.Application.Features.Users.Commands.UpdateUse
             var user = await _userRepository.GetByIdAsync(request.UserId, cancellationToken);
             if (user != null)
             {
-                user.SetStatus(request.IsActive);
+                user.SetOnlineStatus(request.IsOnline);
                 await _userRepository.UpdateAsync(user, cancellationToken);
                 await _userRepository.SaveChangesAsync(cancellationToken);
                 
-                await _notificationService.NotifyUserStatusChangedAsync(request.UserId, request.IsActive);
+                await _notificationService.NotifyUserStatusChangedAsync(request.UserId, request.IsOnline);
             }
         }
     }

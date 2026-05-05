@@ -10,6 +10,7 @@ namespace FitnessApp.Communication.Domain.Entities
         public string FullName { get; private set; } = string.Empty;
         public string? Role { get; set; } // Role can be updated dynamically
         public bool IsActive { get; private set; } = true;
+        public bool IsOnline { get; private set; } = false;
 
         private CommunicationUser() { } // For EF
 
@@ -35,7 +36,12 @@ namespace FitnessApp.Communication.Domain.Entities
             FullName = fullName;
         }
 
-        public void SetStatus(bool isActive)
+        public void SetOnlineStatus(bool isOnline)
+        {
+            IsOnline = isOnline;
+        }
+
+        public void SetActiveStatus(bool isActive)
         {
             IsActive = isActive;
         }
