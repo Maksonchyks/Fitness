@@ -33,6 +33,8 @@ const Login = () => {
       const data = await response.json();
       localStorage.setItem('accessToken', data.accessToken);
       localStorage.setItem('userId', data.userId);
+      localStorage.setItem('userName', data.fullName || data.username);
+      localStorage.setItem('userRole', data.roles && data.roles.length > 0 ? data.roles[0] : 'User');
 
       navigate('/profile');
     } catch (error) {
