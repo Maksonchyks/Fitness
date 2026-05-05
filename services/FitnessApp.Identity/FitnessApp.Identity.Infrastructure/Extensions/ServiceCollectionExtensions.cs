@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using FitnessApp.Identity.Application.Interfaces;
@@ -8,6 +8,10 @@ using FitnessApp.Identity.Infrastructure.Data.Seed;
 using FitnessApp.Identity.Infrastructure.Repositories;
 using FitnessApp.Identity.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
+using MassTransit;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace FitnessApp.Identity.Infrastructure.Extensions
 {
@@ -25,6 +29,26 @@ namespace FitnessApp.Identity.Infrastructure.Extensions
 
             services.AddCaching(configuration);
 
+            services.AddMessaging(configuration);
+
+            return services;
+        }
+
+        private static IServiceCollection AddMessaging(
+            this IServiceCollection services,
+            IConfiguration configuration)
+        {
+            services.AddMassTransit(x =>
+            {
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.Host(configuration["RabbitMQ:Host"] ?? "localhost", "/", h =>
+                    {
+                        h.Username(configuration["RabbitMQ:Username"] ?? "guest");
+                        h.Password(configuration["RabbitMQ:Password"] ?? "guest");
+                    });
+                });
+            });
             return services;
         }
 

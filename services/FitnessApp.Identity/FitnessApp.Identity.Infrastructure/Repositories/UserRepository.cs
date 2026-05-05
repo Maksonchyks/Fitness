@@ -80,11 +80,21 @@ namespace FitnessApp.Identity.Infrastructure.Repositories
 
         public async Task ClearUserRolesAsync(Guid userId, CancellationToken cancellationToken = default)
         {
+            // 1. Очищуємо колекцію в пам'яті, якщо користувач відстежується
+            var trackedUser = _context.ChangeTracker.Entries<User>()
+                .FirstOrDefault(e => e.Entity.Id == userId);
+            
+            if (trackedUser != null)
+            {
+                trackedUser.Entity.ClearRoles();
+            }
+
+            // 2. Видаляємо з бази
             await _context.Set<UserRole>()
                 .Where(ur => ur.UserId == userId)
                 .ExecuteDeleteAsync(cancellationToken);
 
-            // Detach tracked UserRole entities to avoid conflicts
+            // 3. Від'єднуємо застарілі об'єкти відстеження
             var trackedUserRoles = _context.ChangeTracker.Entries<UserRole>()
                 .Where(e => e.Entity.UserId == userId)
                 .ToList();
@@ -95,6 +105,27 @@ namespace FitnessApp.Identity.Infrastructure.Repositories
         public void Update(User user)
         {
             _context.Users.Update(user);
+        }
+
+        public async Task AddUserRoleAsync(Guid userId, Guid roleId, CancellationToken cancellationToken = default)
+        {
+            var userRole = await _context.Set<UserRole>()
+                .FirstOrDefaultAsync(ur => ur.UserId == userId && ur.RoleId == roleId, cancellationToken);
+            
+            if (userRole == null)
+            {
+                // Використовуємо прямий insert, щоб уникнути конфліктів трекінгу
+                await _context.Database.ExecuteSqlRawAsync(
+                    "INSERT INTO \"UserRoles\" (\"Id\", \"UserId\", \"RoleId\", \"AssignedAt\") VALUES ({0}, {1}, {2}, {3})",
+                    new object[] { Guid.NewGuid(), userId, roleId, DateTime.UtcNow },
+                    cancellationToken);
+            }
+        }
+
+        public async Task<int> CountUsersInRoleAsync(string roleName, CancellationToken cancellationToken = default)
+        {
+            return await _context.UserRoles
+                .CountAsync(ur => ur.Role!.Name == roleName, cancellationToken);
         }
     }
 }
