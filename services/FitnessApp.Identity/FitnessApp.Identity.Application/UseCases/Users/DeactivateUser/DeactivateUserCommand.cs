@@ -12,10 +12,12 @@ namespace FitnessApp.Identity.Application.UseCases.Users.DeactivateUser
     public class DeactivateUserCommandHandler : IRequestHandler<DeactivateUserCommand>
     {
         private readonly IUserRepository _userRepository;
+        private readonly MassTransit.IPublishEndpoint _publishEndpoint;
 
-        public DeactivateUserCommandHandler(IUserRepository userRepository)
+        public DeactivateUserCommandHandler(IUserRepository userRepository, MassTransit.IPublishEndpoint publishEndpoint)
         {
             _userRepository = userRepository;
+            _publishEndpoint = publishEndpoint;
         }
 
         public async Task Handle(DeactivateUserCommand request, CancellationToken cancellationToken)
@@ -29,6 +31,12 @@ namespace FitnessApp.Identity.Application.UseCases.Users.DeactivateUser
             user.Deactivate();
             _userRepository.Update(user);
             await _userRepository.SaveChangesAsync(cancellationToken);
+
+            await _publishEndpoint.Publish(new FitnessApp.Identity.Application.Common.Messaging.UserStatusChangedEvent
+            {
+                UserId = user.Id,
+                IsActive = false
+            }, cancellationToken);
         }
     }
 }
