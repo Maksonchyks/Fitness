@@ -20,7 +20,9 @@ const AdminDashboard = () => {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   const fetchUsers = async () => {
-    setIsLoading(true);
+    // Показуємо спінер тільки при першому завантаженні
+    if (users.length === 0) setIsLoading(true);
+    
     const token = localStorage.getItem('accessToken');
     if (!token) {
       navigate('/login');
@@ -37,9 +39,6 @@ const AdminDashboard = () => {
       if (response.ok) {
         const data = await response.json();
         setUsers(data);
-      } else if (response.status === 401 || response.status === 403) {
-        alert('You do not have permission to view this page.');
-        navigate('/profile');
       }
     } catch (error) {
       console.error('Failed to load users', error);
@@ -72,8 +71,12 @@ const AdminDashboard = () => {
         throw new Error(err?.message || `Failed to ${action} user`);
       }
 
-      // Refresh users list
-      await fetchUsers();
+      // Миттєво оновлюємо статус локально
+      const newStatus = action === 'activate' ? 'Active' : 'Inactive';
+      setUsers(prev => prev.map(u => u.id === userId ? { ...u, status: newStatus } : u));
+      
+      // Оновлюємо список фоново для синхронізації
+      fetchUsers();
     } catch (error: any) {
       alert(error.message);
     } finally {
@@ -81,9 +84,8 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleRoleChange = async (userId: string, currentRole: string) => {
-    const newRole = currentRole === 'Admin' ? 'User' : 'Admin';
-    if (!confirm(`Are you sure you want to change role to ${newRole}?`)) return;
+  const handleRoleChange = async (userId: string, targetRole: string) => {
+    if (!confirm(`Ви впевнені, що хочете змінити роль на ${targetRole}?`)) return;
 
     setActionLoading(userId);
     const token = localStorage.getItem('accessToken');
@@ -95,7 +97,7 @@ const AdminDashboard = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ roleName: newRole })
+        body: JSON.stringify({ roleName: targetRole })
       });
 
       if (!response.ok) {
@@ -103,7 +105,11 @@ const AdminDashboard = () => {
         throw new Error(err?.message || 'Failed to change role');
       }
 
-      await fetchUsers();
+      // Миттєво оновлюємо роль локально
+      setUsers(prev => prev.map(u => u.id === userId ? { ...u, roles: [targetRole] } : u));
+
+      // Оновлюємо список фоново для синхронізації
+      fetchUsers();
     } catch (error: any) {
       alert(error.message);
     } finally {
@@ -120,18 +126,17 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div style={{ minHeight: '100vh', padding: '2rem' }}>
-      <header style={{ maxWidth: '1200px', margin: '0 auto 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(30, 41, 59, 0.7)', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Shield size={20} color="var(--primary)" />
+    <div style={{ padding: '2rem 1rem' }}>
+      <header style={{ maxWidth: '1200px', margin: '0 auto 2.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'rgba(30, 41, 59, 0.7)', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Shield size={24} color="var(--primary)" />
           </div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: '700' }}>Admin Dashboard</h1>
+          <div>
+            <h1 style={{ fontSize: '1.75rem', fontWeight: '800', margin: 0 }}>Панель адміністратора</h1>
+            <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.9rem' }}>Керування користувачами та правами доступу</p>
+          </div>
         </div>
-        
-        <button onClick={() => navigate('/profile')} className="btn btn-outline" style={{ padding: '0.5rem 1rem', width: 'auto' }}>
-          Back to Profile
-        </button>
       </header>
 
       <main style={{ maxWidth: '1200px', margin: '0 auto' }}>
@@ -187,29 +192,40 @@ const AdminDashboard = () => {
                         borderRadius: '999px', 
                         fontSize: '0.85rem',
                         fontWeight: '500',
-                        background: isAdmin ? 'rgba(139, 92, 246, 0.1)' : 'rgba(59, 130, 246, 0.1)',
-                        color: isAdmin ? '#8b5cf6' : 'var(--primary)',
+                        background: user.roles?.includes('Admin') ? 'rgba(139, 92, 246, 0.1)' : user.roles?.includes('Trainer') ? 'rgba(16, 185, 129, 0.1)' : 'rgba(59, 130, 246, 0.1)',
+                        color: user.roles?.includes('Admin') ? '#8b5cf6' : user.roles?.includes('Trainer') ? '#10b981' : 'var(--primary)',
                       }}>
-                        {isAdmin ? 'Admin' : 'User'}
+                        {user.roles?.[0] || 'User'}
                       </span>
                     </td>
                     <td style={{ padding: '1rem', textAlign: 'right' }}>
                       <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                        <button 
-                          onClick={() => handleRoleChange(user.id, isAdmin ? 'Admin' : 'User')}
-                          disabled={actionLoading === user.id}
-                          className="btn btn-outline"
-                          style={{ 
-                            padding: '0.4rem 0.75rem', 
-                            width: 'auto',
-                            fontSize: '0.85rem',
-                            display: 'flex',
-                            gap: '0.4rem'
-                          }}
-                        >
-                          <UserCog size={14} />
-                          {isAdmin ? 'Make User' : 'Make Admin'}
-                        </button>
+                        <div style={{ display: 'flex', background: 'rgba(30, 41, 59, 0.5)', padding: '0.25rem', borderRadius: '10px', border: '1px solid var(--glass-border)' }}>
+                            <button 
+                            onClick={() => handleRoleChange(user.id, 'User')}
+                            disabled={actionLoading === user.id}
+                            className={`btn-role ${user.roles?.includes('User') ? 'active' : ''}`}
+                            title="Set as User"
+                            >
+                            User
+                            </button>
+                            <button 
+                            onClick={() => handleRoleChange(user.id, 'Trainer')}
+                            disabled={actionLoading === user.id}
+                            className={`btn-role ${user.roles?.includes('Trainer') ? 'active' : ''}`}
+                            title="Set as Coach"
+                            >
+                            Coach
+                            </button>
+                            <button 
+                            onClick={() => handleRoleChange(user.id, 'Admin')}
+                            disabled={actionLoading === user.id}
+                            className={`btn-role ${user.roles?.includes('Admin') ? 'active' : ''}`}
+                            title="Set as Admin"
+                            >
+                            Admin
+                            </button>
+                        </div>
                         
                         <button 
                           onClick={() => handleStatusChange(user.id, user.status)}
