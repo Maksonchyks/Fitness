@@ -7,7 +7,9 @@ import Profile from './pages/Profile';
 import AdminDashboard from './pages/AdminDashboard';
 import WorkoutDashboard from './pages/WorkoutDashboard';
 import NutritionDashboard from './pages/NutritionDashboard';
+import Chat from './pages/Chat';
 import AuthLayout from './components/AuthLayout';
+import MainLayout from './components/MainLayout';
 
 function App() {
   return (
@@ -21,11 +23,14 @@ function App() {
           <Route path="/reset-password" element={<ResetPassword />} />
         </Route>
         
-        {/* Protected routes would ideally have their own layout/wrapper */}
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/workout" element={<WorkoutDashboard />} />
-        <Route path="/nutrition" element={<NutritionDashboard />} />
-        <Route path="/admin" element={<AdminDashboard />} />
+        {/* Protected routes with MainLayout */}
+        <Route element={<MainLayout />}>
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/workout" element={<WorkoutDashboard />} />
+          <Route path="/nutrition" element={<NutritionDashboard />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/chat" element={<Chat />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );
