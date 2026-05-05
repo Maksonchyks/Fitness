@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Settings, LogOut, Dumbbell, Activity, Save, Loader2, Camera, Shield, Bell, Clock, Plus, Trash2 } from 'lucide-react';
+import { communicationService } from '../services/communicationService';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -57,12 +58,8 @@ const Profile = () => {
 
         // Fetch Notification Preferences
         if (userId) {
-          const token = localStorage.getItem('accessToken');
-          const notifRes = await fetch(`http://localhost:5003/api/notification/preferences/${userId}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
-          if (notifRes.ok) {
-            const data = await notifRes.json();
+          try {
+            const data = await communicationService.getPreferences(userId);
             setNotifSettings({
               nutritionEnabled: data.nutritionEnabled,
               workoutEnabled: data.workoutEnabled,
@@ -72,6 +69,8 @@ const Profile = () => {
                 type: s.type
               }))
             });
+          } catch (err) {
+            console.error('Failed to load notifications', err);
           }
         }
       } catch (error) {
@@ -139,21 +138,11 @@ const Profile = () => {
       }
 
       if (activeTab === 'notifications' && userId) {
-        const response = await fetch('http://localhost:5003/api/Notification/preferences', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            userId: userId,
-            nutritionEnabled: notifSettings.nutritionEnabled,
-            workoutEnabled: notifSettings.workoutEnabled,
-            schedules: notifSettings.schedules
-          })
+        await communicationService.updatePreferences(userId, {
+          nutritionEnabled: notifSettings.nutritionEnabled,
+          workoutEnabled: notifSettings.workoutEnabled,
+          schedules: notifSettings.schedules
         });
-
-        if (!response.ok) throw new Error('Failed to update notifications');
       }
 
       alert('Changes saved successfully!');

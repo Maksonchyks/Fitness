@@ -30,36 +30,34 @@ namespace FitnessApp.Communication.Application.Features.Notifications.Commands.U
         public async Task<bool> Handle(UpdatePreferencesCommand request, CancellationToken ct)
         {
             var preferences = await _repository.GetPreferencesByUserIdAsync(request.UserId, ct);
-            bool isNew = false;
             
             if (preferences == null)
             {
                 preferences = new UserNotificationPreference(request.UserId);
-                isNew = true;
+                await _repository.UpdatePreferencesAsync(preferences, ct);
+                await _repository.SaveChangesAsync(ct);
             }
-
+            else 
+            {
+                // Clear old schedules from DB first
+                await _repository.ClearSchedulesAsync(preferences.Id, ct);
+                // We don't save yet to keep it in one transaction
+            }
+            
+            // 2. Update settings
             preferences.UpdateSettings(request.NutritionEnabled, request.WorkoutEnabled);
             
-            preferences.ClearSchedules();
+            // 3. Add new schedules explicitly marking them as new
+            preferences.ClearSchedules(); 
             foreach (var s in request.Schedules)
             {
                 if (TimeSpan.TryParse(s.Time, out var time))
                 {
-                    preferences.AddSchedule(time, s.Label, s.Type);
+                    var schedule = new ReminderSchedule(preferences.Id, time, s.Label, s.Type);
+                    await _repository.AddScheduleAsync(schedule, ct);
                 }
             }
 
-            if (isNew)
-            {
-                // We need a way to Add it. Let's assume Update handles it or add a method.
-                // Actually, let's fix the repository to handle this.
-                await _repository.UpdatePreferencesAsync(preferences, ct);
-            }
-            else 
-            {
-                await _repository.UpdatePreferencesAsync(preferences, ct);
-            }
-            
             await _repository.SaveChangesAsync(ct);
             return true;
         }

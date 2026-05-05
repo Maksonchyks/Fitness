@@ -32,6 +32,12 @@ namespace FitnessApp.Communication.Infrastructure.Persistence.Repositories
         public async Task<UserNotificationPreference?> GetPreferencesByUserIdAsync(Guid userId, CancellationToken ct)
         {
             return await _context.NotificationPreferences
+                .FirstOrDefaultAsync(p => p.UserId == userId, ct);
+        }
+
+        public async Task<UserNotificationPreference?> GetPreferencesWithSchedulesByUserIdAsync(Guid userId, CancellationToken ct)
+        {
+            return await _context.NotificationPreferences
                 .Include(p => p.Schedules)
                 .FirstOrDefaultAsync(p => p.UserId == userId, ct);
         }
@@ -62,8 +68,21 @@ namespace FitnessApp.Communication.Infrastructure.Persistence.Repositories
             var entry = _context.Entry(preferences);
             if (entry.State == EntityState.Detached)
             {
-                await _context.NotificationPreferences.AddAsync(preferences, ct);
+                var exists = await _context.NotificationPreferences.AnyAsync(p => p.Id == preferences.Id, ct);
+                if (exists)
+                {
+                    _context.NotificationPreferences.Update(preferences);
+                }
+                else
+                {
+                    await _context.NotificationPreferences.AddAsync(preferences, ct);
+                }
             }
+        }
+
+        public async Task AddScheduleAsync(ReminderSchedule schedule, CancellationToken ct)
+        {
+            await _context.ReminderSchedules.AddAsync(schedule, ct);
         }
 
         public async Task ClearSchedulesAsync(Guid preferenceId, CancellationToken ct)

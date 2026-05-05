@@ -33,7 +33,7 @@ namespace FitnessApp.Communication.API.Controllers
             return Ok(await Mediator.Send(new GetHistoryQuery(userId)));
         }
 
-        [HttpPost("preferences")]
+        [HttpPut("preferences")]
         public async Task<IActionResult> UpdatePreferences([FromBody] UpdatePreferencesCommand command)
         {
             return Ok(await Mediator.Send(command));

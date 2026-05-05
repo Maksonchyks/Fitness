@@ -9,6 +9,8 @@ namespace FitnessApp.Communication.Application.Interfaces
     public interface INotificationRepository
     {
         Task<UserNotificationPreference?> GetPreferencesByUserIdAsync(Guid userId, CancellationToken ct);
+        Task<UserNotificationPreference?> GetPreferencesWithSchedulesByUserIdAsync(Guid userId, CancellationToken ct);
+        Task AddScheduleAsync(ReminderSchedule schedule, CancellationToken ct);
         Task UpdatePreferencesAsync(UserNotificationPreference preferences, CancellationToken ct);
         Task AddNotificationAsync(UserNotification notification, CancellationToken ct);
         Task<List<UserNotification>> GetUserHistoryAsync(Guid userId, CancellationToken ct);

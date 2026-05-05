@@ -21,7 +21,7 @@ namespace FitnessApp.Communication.Application.Features.Notifications.Queries.Ge
 
         public async Task<NotificationPreferenceDto> Handle(GetPreferencesQuery request, CancellationToken cancellationToken)
         {
-            var pref = await _notificationRepository.GetPreferencesByUserIdAsync(request.UserId, cancellationToken);
+            var pref = await _notificationRepository.GetPreferencesWithSchedulesByUserIdAsync(request.UserId, cancellationToken);
 
             if (pref == null)
             {

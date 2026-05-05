@@ -131,7 +131,12 @@ export const communicationService = {
     return response.data;
   },
   updatePreferences: async (userId: string, prefs: UserNotificationPreference): Promise<void> => {
-    await api.put(`/notification/preferences/${userId}`, prefs);
+    await api.put(`/Notification/preferences`, {
+        userId: userId,
+        nutritionEnabled: prefs.nutritionEnabled,
+        workoutEnabled: prefs.workoutEnabled,
+        schedules: prefs.schedules
+    });
   },
   getNotificationHistory: async (userId: string): Promise<UserNotification[]> => {
     const response = await api.get(`/notification/history/${userId}`);
