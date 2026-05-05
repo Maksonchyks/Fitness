@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Dumbbell, Activity, Calendar, Play, CheckCircle, ChevronRight, ChevronDown, Loader2, ArrowLeft, Trophy, History as HistoryIcon, Trash2, AlertTriangle, RefreshCw } from 'lucide-react';
+import { Dumbbell, Activity, Calendar, Play, CheckCircle, ChevronDown, Loader2, Trophy, History as HistoryIcon, Trash2, AlertTriangle, RefreshCw } from 'lucide-react';
 
 interface Exercise {
   exerciseType: string;
@@ -76,7 +76,8 @@ const WorkoutDashboard = () => {
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const text = await response.text();
+        const data = text ? JSON.parse(text) : null;
         setActiveProgram(data);
       } else if (response.status === 401) {
         navigate('/login');
@@ -105,8 +106,14 @@ const WorkoutDashboard = () => {
         fetch('http://localhost:5001/api/sessions/history', { headers: { 'Authorization': `Bearer ${token}` } })
       ]);
 
-      if (progRes.ok) setProgramHistory(await progRes.json());
-      if (sessRes.ok) setSessionHistory(await sessRes.json());
+      if (progRes.ok) {
+        const text = await progRes.text();
+        setProgramHistory(text ? JSON.parse(text) : []);
+      }
+      if (sessRes.ok) {
+        const text = await sessRes.text();
+        setSessionHistory(text ? JSON.parse(text) : []);
+      }
     } catch (err) {
       console.error('Failed to load history', err);
     } finally {
@@ -281,18 +288,17 @@ const WorkoutDashboard = () => {
   }
 
   return (
-    <div style={{ minHeight: '100vh', padding: '2rem' }}>
-      <header style={{ maxWidth: '1000px', margin: '0 auto 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(30, 41, 59, 0.7)', border: '1px solid var(--glass-border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Activity size={20} color="var(--primary)" />
+    <div style={{ padding: '2rem 1rem' }}>
+      <header style={{ maxWidth: '1000px', margin: '0 auto 2.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'linear-gradient(135deg, #8b5cf6, #3b82f6)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 16px rgba(139, 92, 246, 0.3)' }}>
+            <Activity size={24} color="white" />
           </div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: '700' }}>My Workout</h1>
+          <div>
+            <h1 style={{ fontSize: '1.75rem', fontWeight: '800', margin: 0 }}>Мої тренування</h1>
+            <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.9rem' }}>Плануйте та відстежуйте свій прогрес</p>
+          </div>
         </div>
-
-        <button onClick={() => navigate('/profile')} className="btn btn-outline" style={{ padding: '0.5rem 1rem', width: 'auto' }}>
-          <ArrowLeft size={16} style={{ marginRight: '0.5rem' }} /> Back to Profile
-        </button>
       </header>
 
       <main style={{ maxWidth: '1000px', margin: '0 auto' }}>
